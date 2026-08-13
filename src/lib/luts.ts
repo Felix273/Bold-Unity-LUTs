@@ -28,3 +28,17 @@ export async function fetchLuts(): Promise<Lut[]> {
   if (error) throw error
   return data ?? []
 }
+
+export async function fetchLutById(id: string): Promise<Lut | null> {
+  const { data, error } = await supabase
+    .from('luts')
+    .select('*')
+    .eq('id', id)
+    .single()
+
+  if (error) {
+    if (error.code === 'PGRST116') return null
+    throw error
+  }
+  return data
+}

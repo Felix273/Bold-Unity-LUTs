@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { fetchLuts, type Lut } from '../lib/luts'
 
 export default function LutGrid() {
@@ -28,9 +29,10 @@ export default function LutGrid() {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       {luts.map((lut) => (
-        <div
+        <Link
+          to={`/lut/${lut.id}`}
           key={lut.id}
-          className="bg-neutral-900 border border-neutral-800 rounded-lg overflow-hidden hover:border-neutral-600 transition-colors"
+          className="bg-neutral-900 border border-neutral-800 rounded-lg overflow-hidden hover:border-neutral-600 transition-colors block"
         >
           <div className="aspect-video bg-neutral-800 flex items-center justify-center text-neutral-600 text-sm">
             {lut.cover_image ? (
@@ -56,7 +58,7 @@ export default function LutGrid() {
               <span className="text-neutral-500 text-sm">★ {lut.rating.toFixed(1)}</span>
             </div>
           </div>
-        </div>
+        </Link>
       ))}
     </div>
   )
