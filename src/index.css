@@ -1,0 +1,35 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+:root {
+  --black: #0a0a0a;
+  --white: #f5f2ed;
+  --red: #c8102e;
+  --gray: #8a8580;
+  --light-gray: #e8e4dd;
+  --font-serif: 'Playfair Display', Georgia, serif;
+  --font-sans: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+}
+
+* { scrollbar-width: thin; scrollbar-color: var(--gray) transparent; }
+*::-webkit-scrollbar { width: 6px; height: 6px; }
+*::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 999px; }
+*::-webkit-scrollbar-track { background: transparent; }
+
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-sans);
+  background: var(--black);
+  color: var(--white);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+.font-serif { font-family: var(--font-serif); }
+.font-sans { font-family: var(--font-sans); }
+
+/* hide cursor on desktop for custom cursor, show on touch */
+@media (hover: hover) and (pointer: fine) {
+  body.custom-cursor { cursor: none; }
+  body.custom-cursor a, body.custom-cursor button { cursor: none; }
+}
