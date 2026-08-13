@@ -2,10 +2,15 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { fetchLuts, type Lut, type LutFilters } from '../lib/luts'
 import { fetchCategories, type Category } from '../lib/categories'
+import { fetchFavoriteIds } from '../lib/favorites'
+import { useAuth } from '../contexts/AuthContext'
+import FavoriteButton from './FavoriteButton'
 
 export default function LutGrid() {
+  const { user } = useAuth()
   const [luts, setLuts] = useState<Lut[]>([])
   const [categories, setCategories] = useState<Category[]>([])
+  const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -14,7 +19,6 @@ export default function LutGrid() {
   const [categoryId, setCategoryId] = useState('')
   const [priceType, setPriceType] = useState<LutFilters['priceType']>('all')
 
-  // debounce search input -> search
   useEffect(() => {
     const t = setTimeout(() => setSearch(searchInput), 300)
     return () => clearTimeout(t)
@@ -23,6 +27,14 @@ export default function LutGrid() {
   useEffect(() => {
     fetchCategories().then(setCategories).catch(() => {})
   }, [])
+
+  useEffect(() => {
+    if (user) {
+      fetchFavoriteIds(user.id).then(setFavoriteIds).catch(() => {})
+    } else {
+      setFavoriteIds(new Set())
+    }
+  }, [user])
 
   useEffect(() => {
     setLoading(true)
@@ -75,7 +87,7 @@ export default function LutGrid() {
             <Link
               to={`/lut/${lut.id}`}
               key={lut.id}
-              className="bg-neutral-900 border border-neutral-800 rounded-lg overflow-hidden hover:border-neutral-600 transition-colors block"
+              className="bg-neutral-900 border border-neutral-800 rounded-lg overflow-hidden hover:border-neutral-600 transition-colors block relative"
             >
               <div className="aspect-video bg-neutral-800 flex items-center justify-center text-neutral-600 text-sm">
                 {lut.cover_image ? (
@@ -87,11 +99,14 @@ export default function LutGrid() {
               <div className="p-4">
                 <div className="flex items-start justify-between gap-2">
                   <h3 className="font-serif text-lg text-white">{lut.title}</h3>
-                  {lut.featured && (
-                    <span className="text-xs bg-red-700 text-white px-2 py-0.5 rounded-full whitespace-nowrap">
-                      Featured
-                    </span>
-                  )}
+                  <div className="flex items-center gap-2">
+                    {lut.featured && (
+                      <span className="text-xs bg-red-700 text-white px-2 py-0.5 rounded-full whitespace-nowrap">
+                        Featured
+                      </span>
+                    )}
+                    <FavoriteButton lutId={lut.id} isFavorited={favoriteIds.has(lut.id)} />
+                  </div>
                 </div>
                 <p className="text-neutral-400 text-sm mt-1 line-clamp-2">{lut.description}</p>
                 <div className="flex items-center justify-between mt-3">

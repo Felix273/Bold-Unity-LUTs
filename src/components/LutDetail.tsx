@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { fetchLutById, downloadFreeLut, type Lut } from '../lib/luts'
+import { fetchFavoriteIds } from '../lib/favorites'
 import { useAuth } from '../contexts/AuthContext'
+import FavoriteButton from './FavoriteButton'
 
 export default function LutDetail() {
   const { id } = useParams<{ id: string }>()
@@ -9,6 +11,7 @@ export default function LutDetail() {
   const [lut, setLut] = useState<Lut | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [isFavorited, setIsFavorited] = useState(false)
 
   const [downloading, setDownloading] = useState(false)
   const [downloadError, setDownloadError] = useState<string | null>(null)
@@ -22,6 +25,14 @@ export default function LutDetail() {
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false))
   }, [id])
+
+  useEffect(() => {
+    if (user && id) {
+      fetchFavoriteIds(user.id).then((ids) => setIsFavorited(ids.has(id))).catch(() => {})
+    } else {
+      setIsFavorited(false)
+    }
+  }, [user, id])
 
   const handleDownload = async () => {
     if (!lut) return
@@ -77,11 +88,14 @@ export default function LutDetail() {
         <div>
           <div className="flex items-start justify-between gap-2">
             <h1 className="font-serif text-3xl text-white">{lut.title}</h1>
-            {lut.featured && (
-              <span className="text-xs bg-red-700 text-white px-2 py-0.5 rounded-full whitespace-nowrap">
-                Featured
-              </span>
-            )}
+            <div className="flex items-center gap-3">
+              {lut.featured && (
+                <span className="text-xs bg-red-700 text-white px-2 py-0.5 rounded-full whitespace-nowrap">
+                  Featured
+                </span>
+              )}
+              <FavoriteButton lutId={lut.id} isFavorited={isFavorited} size="lg" />
+            </div>
           </div>
 
           <p className="text-neutral-400 text-sm mt-1">by {lut.author ?? 'Bold Unity'}</p>
