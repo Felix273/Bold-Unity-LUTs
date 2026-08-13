@@ -18,13 +18,35 @@ export type Lut = {
   created_at: string
 }
 
-export async function fetchLuts(): Promise<Lut[]> {
-  const { data, error } = await supabase
+export type LutFilters = {
+  search?: string
+  categoryId?: string
+  priceType?: 'all' | 'free' | 'premium'
+}
+
+export async function fetchLuts(filters: LutFilters = {}): Promise<Lut[]> {
+  let query = supabase
     .from('luts')
     .select('*')
     .order('featured', { ascending: false })
     .order('downloads', { ascending: false })
 
+  if (filters.categoryId) {
+    query = query.eq('category_id', filters.categoryId)
+  }
+
+  if (filters.priceType === 'free') {
+    query = query.eq('price', 0)
+  } else if (filters.priceType === 'premium') {
+    query = query.gt('price', 0)
+  }
+
+  if (filters.search) {
+    const term = `%${filters.search}%`
+    query = query.or(`title.ilike.${term},description.ilike.${term},author.ilike.${term}`)
+  }
+
+  const { data, error } = await query
   if (error) throw error
   return data ?? []
 }
