@@ -1,12 +1,18 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { fetchLutById, type Lut } from '../lib/luts'
+import { fetchLutById, downloadFreeLut, type Lut } from '../lib/luts'
+import { useAuth } from '../contexts/AuthContext'
 
 export default function LutDetail() {
   const { id } = useParams<{ id: string }>()
+  const { user } = useAuth()
   const [lut, setLut] = useState<Lut | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+
+  const [downloading, setDownloading] = useState(false)
+  const [downloadError, setDownloadError] = useState<string | null>(null)
+  const [downloaded, setDownloaded] = useState(false)
 
   useEffect(() => {
     if (!id) return
@@ -16,6 +22,21 @@ export default function LutDetail() {
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false))
   }, [id])
+
+  const handleDownload = async () => {
+    if (!lut) return
+    setDownloadError(null)
+    setDownloading(true)
+    try {
+      await downloadFreeLut(lut.id)
+      setDownloaded(true)
+      setLut({ ...lut, downloads: lut.downloads + 1 })
+    } catch (err: any) {
+      setDownloadError(err.message ?? 'Download failed')
+    } finally {
+      setDownloading(false)
+    }
+  }
 
   if (loading) {
     return <p className="text-neutral-500 text-center py-12">Loading...</p>
@@ -35,6 +56,8 @@ export default function LutDetail() {
       </div>
     )
   }
+
+  const isFree = lut.price === 0
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -86,13 +109,36 @@ export default function LutDetail() {
             </p>
           )}
 
-          <div className="mt-8 flex items-center justify-between border-t border-neutral-800 pt-6">
-            <span className="text-2xl font-medium text-white">
-              {lut.price === 0 ? 'Free' : `KES ${lut.price.toLocaleString()}`}
-            </span>
-            <button className="bg-red-700 hover:bg-red-600 text-white rounded px-6 py-3 font-medium">
-              {lut.price === 0 ? 'Download' : 'Buy Now'}
-            </button>
+          <div className="mt-8 border-t border-neutral-800 pt-6">
+            <div className="flex items-center justify-between">
+              <span className="text-2xl font-medium text-white">
+                {isFree ? 'Free' : `KES ${lut.price.toLocaleString()}`}
+              </span>
+
+              {isFree ? (
+                !user ? (
+                  <span className="text-neutral-500 text-sm">Sign in to download</span>
+                ) : downloaded ? (
+                  <span className="text-green-500 text-sm">Downloaded ✓</span>
+                ) : (
+                  <button
+                    onClick={handleDownload}
+                    disabled={downloading}
+                    className="bg-red-700 hover:bg-red-600 text-white rounded px-6 py-3 font-medium disabled:opacity-50"
+                  >
+                    {downloading ? 'Downloading...' : 'Download'}
+                  </button>
+                )
+              ) : (
+                <button className="bg-red-700 hover:bg-red-600 text-white rounded px-6 py-3 font-medium">
+                  Buy Now
+                </button>
+              )}
+            </div>
+
+            {downloadError && (
+              <p className="text-red-500 text-sm mt-2">{downloadError}</p>
+            )}
           </div>
         </div>
       </div>

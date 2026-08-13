@@ -42,3 +42,9 @@ export async function fetchLutById(id: string): Promise<Lut | null> {
   }
   return data
 }
+
+export async function downloadFreeLut(lutId: string) {
+  const { data, error } = await supabase.rpc('record_free_download', { p_lut_id: lutId })
+  if (error) throw error
+  return data
+}
