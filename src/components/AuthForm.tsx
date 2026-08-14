@@ -33,42 +33,42 @@ export default function AuthForm() {
   }
 
   return (
-    <div className="max-w-sm mx-auto bg-neutral-900 border border-neutral-800 rounded-lg p-8">
-      <h2 className="font-serif text-2xl mb-6 text-white">
+    <div className="w-full max-w-sm bg-white border border-neutral-200 rounded-xl p-8 shadow-sm">
+      <h2 className="font-serif text-2xl mb-6 text-neutral-900">
         {mode === 'signin' ? 'Sign In' : 'Create Account'}
       </h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm text-neutral-400 mb-1">Email</label>
+          <label className="block text-sm text-neutral-600 mb-1">Email</label>
           <input
             type="email"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full bg-neutral-800 border border-neutral-700 rounded px-3 py-2 text-white"
+            className="w-full bg-neutral-50 border border-neutral-300 rounded-lg px-3 py-2 text-neutral-900 focus:outline-none focus:border-neutral-500"
           />
         </div>
 
         <div>
-          <label className="block text-sm text-neutral-400 mb-1">Password</label>
+          <label className="block text-sm text-neutral-600 mb-1">Password</label>
           <input
             type="password"
             required
             minLength={6}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full bg-neutral-800 border border-neutral-700 rounded px-3 py-2 text-white"
+            className="w-full bg-neutral-50 border border-neutral-300 rounded-lg px-3 py-2 text-neutral-900 focus:outline-none focus:border-neutral-500"
           />
         </div>
 
-        {error && <p className="text-red-500 text-sm">{error}</p>}
-        {message && <p className="text-green-500 text-sm">{message}</p>}
+        {error && <p className="text-red-600 text-sm">{error}</p>}
+        {message && <p className="text-green-600 text-sm">{message}</p>}
 
         <button
           type="submit"
           disabled={submitting}
-          className="w-full bg-red-700 hover:bg-red-600 text-white rounded py-2 font-medium disabled:opacity-50"
+          className="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-full py-2.5 font-medium disabled:opacity-50 transition-colors"
         >
           {submitting ? 'Please wait...' : mode === 'signin' ? 'Sign In' : 'Sign Up'}
         </button>
@@ -76,7 +76,7 @@ export default function AuthForm() {
 
       <button
         onClick={() => { setMode(mode === 'signin' ? 'signup' : 'signin'); setError(null); setMessage(null) }}
-        className="w-full text-center text-sm text-neutral-400 mt-4 hover:text-white"
+        className="w-full text-center text-sm text-neutral-500 mt-4 hover:text-neutral-900 transition-colors"
       >
         {mode === 'signin' ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
       </button>

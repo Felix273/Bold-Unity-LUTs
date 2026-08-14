@@ -50,18 +50,18 @@ export default function LutDetail() {
   }
 
   if (loading) {
-    return <p className="text-neutral-500 text-center py-12">Loading...</p>
+    return <p className="text-neutral-400 text-center py-16">Loading...</p>
   }
 
   if (error) {
-    return <p className="text-red-500 text-center py-12">Failed to load LUT: {error}</p>
+    return <p className="text-red-600 text-center py-16">Failed to load LUT: {error}</p>
   }
 
   if (!lut) {
     return (
-      <div className="text-center py-12">
-        <p className="text-neutral-400 mb-4">LUT not found.</p>
-        <Link to="/" className="text-red-500 hover:text-red-400 underline">
+      <div className="text-center py-16">
+        <p className="text-neutral-500 mb-4">LUT not found.</p>
+        <Link to="/" className="text-indigo-600 hover:text-indigo-700 underline">
           Back to catalog
         </Link>
       </div>
@@ -72,25 +72,25 @@ export default function LutDetail() {
 
   return (
     <div className="max-w-4xl mx-auto">
-      <Link to="/" className="text-neutral-500 hover:text-white text-sm mb-6 inline-block">
+      <Link to="/" className="text-neutral-400 hover:text-neutral-900 text-sm mb-6 inline-flex items-center gap-1 transition-colors">
         &larr; Back to catalog
       </Link>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div className="aspect-video bg-neutral-800 rounded-lg flex items-center justify-center text-neutral-600">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+        <div className="aspect-video bg-neutral-100 rounded-xl flex items-center justify-center text-neutral-300 border border-neutral-200 overflow-hidden">
           {lut.cover_image ? (
-            <img src={lut.cover_image} alt={lut.title} className="w-full h-full object-cover rounded-lg" />
+            <img src={lut.cover_image} alt={lut.title} className="w-full h-full object-cover" />
           ) : (
-            'No preview'
+            <span className="font-serif">No preview</span>
           )}
         </div>
 
         <div>
           <div className="flex items-start justify-between gap-2">
-            <h1 className="font-serif text-3xl text-white">{lut.title}</h1>
+            <h1 className="font-serif text-3xl text-neutral-900">{lut.title}</h1>
             <div className="flex items-center gap-3">
               {lut.featured && (
-                <span className="text-xs bg-red-700 text-white px-2 py-0.5 rounded-full whitespace-nowrap">
+                <span className="text-xs font-semibold bg-indigo-600 text-white px-2 py-1 rounded">
                   Featured
                 </span>
               )}
@@ -98,11 +98,11 @@ export default function LutDetail() {
             </div>
           </div>
 
-          <p className="text-neutral-400 text-sm mt-1">by {lut.author ?? 'Bold Unity'}</p>
+          <p className="text-neutral-500 text-sm mt-1">by {lut.author ?? 'Bold Unity'}</p>
 
-          <p className="text-neutral-300 mt-4">{lut.description}</p>
+          <p className="text-neutral-700 mt-4">{lut.description}</p>
 
-          <div className="flex items-center gap-4 mt-4 text-sm text-neutral-400">
+          <div className="flex items-center gap-4 mt-4 text-sm text-neutral-500">
             <span>★ {lut.rating.toFixed(1)}</span>
             <span>{lut.downloads} downloads</span>
           </div>
@@ -110,7 +110,7 @@ export default function LutDetail() {
           {lut.tags?.length > 0 && (
             <div className="flex flex-wrap gap-2 mt-4">
               {lut.tags.map((tag) => (
-                <span key={tag} className="text-xs bg-neutral-800 text-neutral-400 px-2 py-1 rounded">
+                <span key={tag} className="text-xs bg-neutral-100 text-neutral-600 px-2 py-1 rounded-full">
                   #{tag}
                 </span>
               ))}
@@ -123,35 +123,35 @@ export default function LutDetail() {
             </p>
           )}
 
-          <div className="mt-8 border-t border-neutral-800 pt-6">
+          <div className="mt-8 border-t border-neutral-200 pt-6">
             <div className="flex items-center justify-between">
-              <span className="text-2xl font-medium text-white">
+              <span className="text-2xl font-semibold text-neutral-900">
                 {isFree ? 'Free' : `KES ${lut.price.toLocaleString()}`}
               </span>
 
               {isFree ? (
                 !user ? (
-                  <span className="text-neutral-500 text-sm">Sign in to download</span>
+                  <span className="text-neutral-400 text-sm">Sign in to download</span>
                 ) : downloaded ? (
-                  <span className="text-green-500 text-sm">Downloaded ✓</span>
+                  <span className="text-green-600 text-sm font-medium">Downloaded ✓</span>
                 ) : (
                   <button
                     onClick={handleDownload}
                     disabled={downloading}
-                    className="bg-red-700 hover:bg-red-600 text-white rounded px-6 py-3 font-medium disabled:opacity-50"
+                    className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-full px-6 py-3 font-medium disabled:opacity-50 transition-colors"
                   >
                     {downloading ? 'Downloading...' : 'Download'}
                   </button>
                 )
               ) : (
-                <button className="bg-red-700 hover:bg-red-600 text-white rounded px-6 py-3 font-medium">
+                <button className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-full px-6 py-3 font-medium transition-colors">
                   Buy Now
                 </button>
               )}
             </div>
 
             {downloadError && (
-              <p className="text-red-500 text-sm mt-2">{downloadError}</p>
+              <p className="text-red-600 text-sm mt-2">{downloadError}</p>
             )}
           </div>
         </div>

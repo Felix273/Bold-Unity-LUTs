@@ -1,55 +1,126 @@
 import './App.css'
 import { Routes, Route, Link } from 'react-router-dom'
 import { useAuth } from './contexts/AuthContext'
-import AuthForm from './components/AuthForm'
 import LutGrid from './components/LutGrid'
 import LutDetail from './components/LutDetail'
 
 function CatalogPage() {
-  const { user } = useAuth()
   return (
-    <>
-      {!user && (
-        <div className="mb-12">
-          <AuthForm />
+    <div className="marketplace-page">
+      <div className="marketplace-heading">
+        <div>
+          <div className="marketplace-kicker">
+            BOLD UNITY / LUT LIBRARY
+          </div>
+
+          <h1>Color grading LUTs</h1>
+
+          <p>
+            Cinematic looks for filmmakers, photographers and
+            creators.
+          </p>
         </div>
-      )}
-      <h2 className="font-serif text-3xl mb-6">Cinematic LUTs</h2>
+      </div>
+
       <LutGrid />
-    </>
+    </div>
+  )
+}
+
+function Header() {
+  const { user, profile, loading, signOut } = useAuth()
+
+  return (
+    <header className="marketplace-header">
+      <div className="marketplace-header-inner">
+        <Link to="/" className="marketplace-brand">
+          <span className="marketplace-brand-symbol">
+            BU
+          </span>
+
+          <span className="marketplace-brand-name">
+            BOLD UNITY
+          </span>
+        </Link>
+
+        <nav className="marketplace-nav">
+          <Link
+            to="/"
+            className="marketplace-nav-active"
+          >
+            LUTs
+          </Link>
+
+          <a href="#categories">
+            Categories
+          </a>
+
+          <a href="#free">
+            Free LUTs
+          </a>
+
+          <a href="#about">
+            About
+          </a>
+        </nav>
+
+        <div className="marketplace-account">
+          {!loading &&
+            (user ? (
+              <div className="marketplace-user">
+                <span>
+                  {profile?.plan ?? 'Free'}
+                </span>
+
+                <button onClick={signOut}>
+                  Sign out
+                </button>
+              </div>
+            ) : (
+              <Link
+                to="/"
+                className="marketplace-signin"
+              >
+                Sign in
+              </Link>
+            ))}
+        </div>
+      </div>
+    </header>
   )
 }
 
 function App() {
-  const { user, profile, loading, signOut } = useAuth()
-
   return (
-    <div className="min-h-screen bg-black text-white">
-      <header className="border-b border-neutral-800 px-6 py-4 flex items-center justify-between">
-        <Link to="/" className="font-serif text-2xl">BOLD UNITY</Link>
+    <div className="app">
+      <Header />
 
-        {!loading && (
-          user ? (
-            <div className="flex items-center gap-4 text-sm">
-              <span className="text-neutral-400">
-                {user.email} · {profile?.plan ?? '...'} ({profile?.downloads_used ?? 0}/{profile?.downloads_limit ?? 0})
-              </span>
-              <button onClick={signOut} className="text-red-500 hover:text-red-400 underline">
-                Sign out
-              </button>
-            </div>
-          ) : (
-            <span className="text-neutral-500 text-sm">Not signed in</span>
-          )
-        )}
-      </header>
-
-      <main className="px-6 py-10 max-w-6xl mx-auto">
+      <main className="marketplace-main">
         <Routes>
-          <Route path="/" element={<CatalogPage />} />
-          <Route path="/lut/:id" element={<LutDetail />} />
+          <Route
+            path="/"
+            element={<CatalogPage />}
+          />
+
+          <Route
+            path="/lut/:id"
+            element={<LutDetail />}
+          />
         </Routes>
       </main>
+
+      <footer className="marketplace-footer">
+        <div>
+          <strong>BOLD UNITY</strong>
+          <span>
+            Cinematic color tools for modern creators.
+          </span>
+        </div>
+
+        <span>
+          © {new Date().getFullYear()} Bold Unity
+        </span>
+      </footer>
     </div>
   )
 }

@@ -1,0 +1,1030 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600&family=Playfair+Display:wght@500;600&display=swap');
+
+:root {
+  font-family: 'Inter', sans-serif;
+  color: #f4f4f2;
+  background: #0b0b0b;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background: #0b0b0b;
+  color: #f4f4f2;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* =========================================================
+   APP
+   ========================================================= */
+
+.app {
+  min-height: 100vh;
+  background:
+    radial-gradient(
+      circle at 50% -20%,
+      rgba(255, 255, 255, 0.045),
+      transparent 35%
+    ),
+    #0b0b0b;
+}
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.marketplace-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+
+  height: 72px;
+
+  border-bottom: 1px solid #202020;
+
+  background: rgba(11, 11, 11, 0.94);
+  backdrop-filter: blur(18px);
+}
+
+.marketplace-header-inner {
+  width: min(1440px, calc(100% - 48px));
+  height: 100%;
+  margin: 0 auto;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.marketplace-brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+
+  min-width: 190px;
+}
+
+.marketplace-brand-symbol {
+  width: 34px;
+  height: 34px;
+
+  display: grid;
+  place-items: center;
+
+  border: 1px solid #404040;
+  border-radius: 50%;
+
+  color: #fff;
+
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: -0.08em;
+}
+
+.marketplace-brand-name {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+}
+
+.marketplace-nav {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+
+  color: #8c8c8c;
+
+  font-size: 12px;
+}
+
+.marketplace-nav a {
+  transition: color 160ms ease;
+}
+
+.marketplace-nav a:hover,
+.marketplace-nav-active {
+  color: #fff;
+}
+
+.marketplace-account {
+  min-width: 190px;
+
+  display: flex;
+  justify-content: flex-end;
+}
+
+.marketplace-signin {
+  padding: 8px 17px;
+
+  border: 1px solid #343434;
+  border-radius: 999px;
+
+  color: #ddd;
+
+  font-size: 12px;
+
+  transition:
+    background 160ms ease,
+    border-color 160ms ease;
+}
+
+.marketplace-signin:hover {
+  background: #191919;
+  border-color: #555;
+}
+
+.marketplace-user {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  color: #888;
+  font-size: 11px;
+}
+
+.marketplace-user button {
+  padding: 8px 14px;
+
+  border: 1px solid #343434;
+  border-radius: 999px;
+
+  background: transparent;
+  color: #ccc;
+
+  font-size: 11px;
+}
+
+.marketplace-user button:hover {
+  background: #1b1b1b;
+  color: #fff;
+}
+
+/* =========================================================
+   MAIN
+   ========================================================= */
+
+.marketplace-main {
+  width: min(1440px, calc(100% - 48px));
+  margin: 0 auto;
+}
+
+/* =========================================================
+   CATALOG HEADER
+   ========================================================= */
+
+.marketplace-heading {
+  padding: 66px 0 42px;
+
+  border-bottom: 1px solid #202020;
+}
+
+.marketplace-kicker {
+  margin-bottom: 16px;
+
+  color: #777;
+
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.22em;
+}
+
+.marketplace-heading h1 {
+  margin: 0;
+
+  color: #f4f4f2;
+
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(48px, 5vw, 72px);
+  font-weight: 500;
+  line-height: 0.98;
+  letter-spacing: -0.045em;
+}
+
+.marketplace-heading p {
+  margin: 20px 0 0;
+
+  color: #777;
+
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+/* =========================================================
+   LUT MARKETPLACE
+   ========================================================= */
+
+.lut-marketplace {
+  padding: 30px 0 100px;
+}
+
+/* =========================================================
+   SEARCH
+   ========================================================= */
+
+.lut-toolbar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 30px;
+}
+
+.lut-search {
+  position: relative;
+  flex: 1;
+
+  height: 48px;
+
+  border: 1px solid #303030;
+  border-radius: 3px;
+
+  background: #111;
+
+  display: flex;
+  align-items: center;
+
+  transition:
+    border-color 160ms ease,
+    background 160ms ease;
+}
+
+.lut-search:focus-within {
+  border-color: #555;
+  background: #141414;
+}
+
+.lut-search-icon {
+  width: 52px;
+
+  display: grid;
+  place-items: center;
+
+  color: #666;
+
+  font-size: 22px;
+  line-height: 1;
+}
+
+.lut-search input {
+  flex: 1;
+
+  height: 100%;
+
+  border: 0;
+  outline: 0;
+
+  background: transparent;
+  color: #eee;
+
+  font-size: 13px;
+}
+
+.lut-search input::placeholder {
+  color: #5d5d5d;
+}
+
+.lut-search-clear {
+  width: 46px;
+  height: 100%;
+
+  border: 0;
+  background: transparent;
+
+  color: #777;
+
+  font-size: 20px;
+}
+
+.lut-search-clear:hover {
+  color: #fff;
+}
+
+.mobile-filter-button {
+  display: none;
+
+  padding: 0 20px;
+
+  border: 1px solid #303030;
+  border-radius: 3px;
+
+  background: #111;
+  color: #ddd;
+
+  font-size: 12px;
+}
+
+/* =========================================================
+   MARKETPLACE LAYOUT
+   ========================================================= */
+
+.lut-marketplace-layout {
+  display: grid;
+  grid-template-columns: 210px minmax(0, 1fr);
+  gap: 38px;
+}
+
+/* =========================================================
+   FILTER SIDEBAR
+   ========================================================= */
+
+.lut-filter-sidebar {
+  align-self: start;
+
+  position: sticky;
+  top: 102px;
+
+  padding-right: 25px;
+
+  border-right: 1px solid #202020;
+}
+
+.filter-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 28px;
+}
+
+.filter-header h2 {
+  margin: 0;
+
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.filter-header button {
+  padding: 0;
+
+  border: 0;
+  background: transparent;
+
+  color: #666;
+
+  font-size: 10px;
+}
+
+.filter-header button:hover {
+  color: #fff;
+}
+
+.filter-section {
+  margin-bottom: 32px;
+}
+
+.filter-section h3 {
+  margin: 0 0 13px;
+
+  color: #777;
+
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.filter-option {
+  width: 100%;
+
+  min-height: 32px;
+
+  padding: 6px 0;
+
+  border: 0;
+  background: transparent;
+
+  color: #777;
+
+  display: flex;
+  align-items: center;
+
+  text-align: left;
+
+  font-size: 12px;
+
+  transition:
+    color 160ms ease,
+    padding-left 160ms ease;
+}
+
+.filter-option:hover {
+  color: #ddd;
+  padding-left: 4px;
+}
+
+.filter-option-active {
+  color: #fff;
+  font-weight: 500;
+}
+
+/* =========================================================
+   RESULTS
+   ========================================================= */
+
+.lut-results {
+  min-width: 0;
+}
+
+.results-header {
+  min-height: 38px;
+  margin-bottom: 22px;
+
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.results-count {
+  margin: 0;
+
+  color: #aaa;
+
+  font-size: 12px;
+}
+
+.active-filter {
+  display: inline-block;
+
+  margin-top: 7px;
+  padding: 4px 8px;
+
+  border: 1px solid #333;
+
+  color: #999;
+
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.results-sort {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+
+  color: #666;
+
+  font-size: 10px;
+}
+
+.results-sort select {
+  min-width: 145px;
+
+  padding: 8px 10px;
+
+  border: 1px solid #303030;
+  border-radius: 2px;
+
+  outline: 0;
+
+  background: #111;
+  color: #bbb;
+
+  font-size: 11px;
+}
+
+.results-sort select:focus {
+  border-color: #555;
+}
+
+/* =========================================================
+   LUT GRID
+   ========================================================= */
+
+.lut-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 28px 18px;
+}
+
+/* =========================================================
+   LUT CARD
+   ========================================================= */
+
+.lut-card {
+  min-width: 0;
+
+  background: transparent;
+}
+
+.lut-card-preview {
+  position: relative;
+
+  display: block;
+
+  aspect-ratio: 16 / 10;
+
+  overflow: hidden;
+
+  background: #171717;
+
+  border: 1px solid #242424;
+}
+
+.lut-card-image {
+  position: absolute;
+  inset: 0;
+
+  overflow: hidden;
+
+  transition: transform 400ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.lut-card-image img {
+  width: 100%;
+  height: 100%;
+
+  display: block;
+
+  object-fit: cover;
+
+  transition:
+    transform 500ms cubic-bezier(0.2, 0.7, 0.2, 1),
+    opacity 300ms ease;
+}
+
+.lut-card-media {
+  width: 100%;
+  height: 100%;
+
+  display: block;
+
+  object-fit: cover;
+
+  transition:
+    transform 500ms cubic-bezier(0.2, 0.7, 0.2, 1),
+    opacity 300ms ease;
+}
+
+.lut-card:hover .lut-card-media {
+  transform: scale(1.035);
+}
+
+.lut-card-image video {
+  background: #111;
+}
+
+.lut-card:hover .lut-card-image {
+  transform: scale(1.025);
+}
+
+.lut-card:hover .lut-card-image img {
+  transform: scale(1.035);
+}
+
+.lut-card-overlay {
+  position: absolute;
+  inset: 0;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.08),
+      transparent 42%,
+      rgba(0, 0, 0, 0.58)
+    );
+
+  opacity: 0.8;
+
+  transition: opacity 250ms ease;
+}
+
+.lut-card:hover .lut-card-overlay {
+  opacity: 1;
+}
+
+.lut-card-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+
+  padding: 5px 7px;
+
+  background: rgba(0, 0, 0, 0.62);
+
+  border: 1px solid rgba(255, 255, 255, 0.18);
+
+  color: #eee;
+
+  font-family: 'DM Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 0.08em;
+}
+
+.lut-card-view {
+  position: absolute;
+  left: 50%;
+  bottom: 18px;
+
+  transform: translate(-50%, 8px);
+
+  padding: 9px 14px;
+
+  border: 1px solid rgba(255, 255, 255, 0.35);
+
+  background: rgba(0, 0, 0, 0.62);
+
+  color: white;
+
+  font-size: 10px;
+  white-space: nowrap;
+
+  opacity: 0;
+
+  transition:
+    opacity 200ms ease,
+    transform 200ms ease;
+}
+
+.lut-card:hover .lut-card-view {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+/* =========================================================
+   CARD CONTENT
+   ========================================================= */
+
+.lut-card-content {
+  padding-top: 11px;
+}
+
+.lut-card-title-row {
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.lut-card-title {
+  min-width: 0;
+
+  overflow: hidden;
+
+  color: #eee;
+
+  font-size: 12px;
+  font-weight: 500;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  transition: color 160ms ease;
+}
+
+.lut-card-title:hover {
+  color: #fff;
+}
+
+.lut-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  margin-top: 6px;
+
+  color: #656565;
+
+  font-size: 10px;
+}
+
+.lut-card-bottom {
+  margin-top: 10px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.lut-card-downloads {
+  color: #555;
+
+  font-size: 9px;
+}
+
+.lut-card-price {
+  color: #bbb;
+
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+}
+
+/* =========================================================
+   FAVORITE BUTTON
+   ========================================================= */
+
+.lut-card-title-row button {
+  flex: 0 0 auto;
+}
+
+/* =========================================================
+   LOADING
+   ========================================================= */
+
+.lut-card-skeleton {
+  pointer-events: none;
+}
+
+.lut-card-skeleton .lut-card-image {
+  position: relative;
+
+  background:
+    linear-gradient(
+      90deg,
+      #151515 0%,
+      #202020 50%,
+      #151515 100%
+    );
+
+  background-size: 200% 100%;
+
+  animation: skeleton 1.4s ease infinite;
+}
+
+.lut-card-skeleton .lut-card-content > div {
+  height: 10px;
+
+  margin-bottom: 8px;
+
+  background: #191919;
+}
+
+.lut-card-skeleton .lut-card-content > div:first-child {
+  width: 65%;
+}
+
+.lut-card-skeleton .lut-card-content > div:last-child {
+  width: 42%;
+}
+
+@keyframes skeleton {
+  from {
+    background-position: 200% 0;
+  }
+
+  to {
+    background-position: -200% 0;
+  }
+}
+
+/* =========================================================
+   EMPTY / ERROR
+   ========================================================= */
+
+.lut-empty {
+  min-height: 420px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid #202020;
+
+  text-align: center;
+}
+
+.lut-empty-symbol {
+  margin-bottom: 18px;
+
+  color: #555;
+
+  font-size: 28px;
+}
+
+.lut-empty h3 {
+  margin: 0;
+
+  font-family: 'Playfair Display', serif;
+  font-size: 28px;
+  font-weight: 500;
+}
+
+.lut-empty p {
+  margin: 10px 0 20px;
+
+  color: #666;
+
+  font-size: 12px;
+}
+
+.lut-empty button {
+  padding: 9px 15px;
+
+  border: 1px solid #333;
+
+  background: #151515;
+  color: #ccc;
+
+  font-size: 11px;
+}
+
+.lut-empty button:hover {
+  background: #202020;
+  color: white;
+}
+
+.lut-error {
+  min-height: 250px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid #302020;
+
+  color: #777;
+
+  text-align: center;
+}
+
+.lut-error strong {
+  margin-bottom: 8px;
+
+  color: #ddd;
+
+  font-size: 13px;
+}
+
+.lut-error span {
+  font-size: 11px;
+}
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.marketplace-footer {
+  width: min(1440px, calc(100% - 48px));
+
+  margin: 0 auto;
+
+  padding: 40px 0;
+
+  border-top: 1px solid #202020;
+
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+
+  color: #555;
+
+  font-size: 10px;
+}
+
+.marketplace-footer div {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.marketplace-footer strong {
+  color: #aaa;
+
+  font-size: 11px;
+  letter-spacing: 0.16em;
+}
+
+.marketplace-footer span {
+  color: #555;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1150px) {
+  .lut-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 850px) {
+  .marketplace-header {
+    height: 64px;
+  }
+
+  .marketplace-header-inner,
+  .marketplace-main,
+  .marketplace-footer {
+    width: calc(100% - 32px);
+  }
+
+  .marketplace-nav {
+    display: none;
+  }
+
+  .marketplace-brand {
+    min-width: auto;
+  }
+
+  .marketplace-account {
+    min-width: auto;
+  }
+
+  .marketplace-heading {
+    padding: 48px 0 32px;
+  }
+
+  .marketplace-heading h1 {
+    font-size: 48px;
+  }
+
+  .lut-marketplace-layout {
+    display: block;
+  }
+
+  .mobile-filter-button {
+    display: block;
+  }
+
+  .lut-filter-sidebar {
+    display: none;
+
+    position: static;
+
+    margin-bottom: 25px;
+    padding: 22px;
+
+    border: 1px solid #242424;
+
+    background: #101010;
+  }
+
+  .lut-filter-sidebar-open {
+    display: block;
+  }
+
+  .lut-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 25px 14px;
+  }
+
+  .results-sort {
+    display: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .marketplace-heading h1 {
+    font-size: 39px;
+  }
+
+  .marketplace-heading p {
+    font-size: 13px;
+  }
+
+  .lut-toolbar {
+    display: grid;
+    grid-template-columns: 1fr auto;
+  }
+
+  .lut-search {
+    min-width: 0;
+  }
+
+  .lut-grid {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+
+  .lut-card-preview {
+    aspect-ratio: 16 / 9;
+  }
+
+  .marketplace-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 25px;
+  }
+}

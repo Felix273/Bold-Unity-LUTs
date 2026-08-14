@@ -3,123 +3,527 @@ import { Link } from 'react-router-dom'
 import { fetchLuts, type Lut, type LutFilters } from '../lib/luts'
 import { fetchCategories, type Category } from '../lib/categories'
 import { fetchFavoriteIds } from '../lib/favorites'
+import { gradientForStyle } from '../lib/gradients'
 import { useAuth } from '../contexts/AuthContext'
 import FavoriteButton from './FavoriteButton'
 
+type SortKey =
+  | 'popular'
+  | 'newest'
+  | 'rating'
+  | 'price-low'
+  | 'price-high'
+
 export default function LutGrid() {
   const { user } = useAuth()
+
   const [luts, setLuts] = useState<Lut[]>([])
   const [categories, setCategories] = useState<Category[]>([])
-  const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set())
+  const [favoriteIds, setFavoriteIds] = useState<Set<string>>(
+    new Set()
+  )
+
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   const [searchInput, setSearchInput] = useState('')
   const [search, setSearch] = useState('')
+
   const [categoryId, setCategoryId] = useState('')
-  const [priceType, setPriceType] = useState<LutFilters['priceType']>('all')
+  const [priceType, setPriceType] = useState<
+    'all' | 'free' | 'premium'
+  >('all')
+
+  const [sort, setSort] = useState<SortKey>('popular')
+
+  const [mobileFiltersOpen, setMobileFiltersOpen] =
+    useState(false)
 
   useEffect(() => {
-    const t = setTimeout(() => setSearch(searchInput), 300)
-    return () => clearTimeout(t)
+    const timer = window.setTimeout(() => {
+      setSearch(searchInput.trim())
+    }, 300)
+
+    return () => window.clearTimeout(timer)
   }, [searchInput])
 
   useEffect(() => {
-    fetchCategories().then(setCategories).catch(() => {})
+    fetchCategories()
+      .then(setCategories)
+      .catch(() => setCategories([]))
   }, [])
 
   useEffect(() => {
-    if (user) {
-      fetchFavoriteIds(user.id).then(setFavoriteIds).catch(() => {})
-    } else {
+    if (!user) {
       setFavoriteIds(new Set())
+      return
     }
+
+    fetchFavoriteIds(user.id)
+      .then(setFavoriteIds)
+      .catch(() => setFavoriteIds(new Set()))
   }, [user])
 
   useEffect(() => {
-    setLoading(true)
-    fetchLuts({ search, categoryId: categoryId || undefined, priceType })
-      .then(setLuts)
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false))
-  }, [search, categoryId, priceType])
+    let mounted = true
+
+    async function loadLuts() {
+      setLoading(true)
+      setError(null)
+
+      const filters: LutFilters = {
+        search: search || undefined,
+        categoryId: categoryId || undefined,
+        priceType,
+        sort,
+        page: 1,
+        pageSize: 40,
+      }
+
+      try {
+        const data = await fetchLuts(filters)
+
+        if (mounted) {
+          setLuts(data)
+        }
+      } catch (err) {
+        if (mounted) {
+          setError(
+            err instanceof Error
+              ? err.message
+              : 'Unable to load LUTs.'
+          )
+        }
+      } finally {
+        if (mounted) {
+          setLoading(false)
+        }
+      }
+    }
+
+    loadLuts()
+
+    return () => {
+      mounted = false
+    }
+  }, [search, categoryId, priceType, sort])
+
+  const activeCategory = categories.find(
+    (category) => category.id === categoryId
+  )
+
+  const clearFilters = () => {
+    setSearchInput('')
+    setSearch('')
+    setCategoryId('')
+    setPriceType('all')
+    setSort('popular')
+  }
 
   return (
-    <div>
-      <div className="flex flex-col sm:flex-row gap-3 mb-8">
-        <input
-          type="text"
-          placeholder="Search LUTs..."
-          value={searchInput}
-          onChange={(e) => setSearchInput(e.target.value)}
-          className="flex-1 bg-neutral-900 border border-neutral-800 rounded px-3 py-2 text-white placeholder-neutral-500"
-        />
-        <select
-          value={categoryId}
-          onChange={(e) => setCategoryId(e.target.value)}
-          className="bg-neutral-900 border border-neutral-800 rounded px-3 py-2 text-white"
+    <section className="lut-marketplace">
+      <div className="lut-toolbar">
+        <div className="lut-search">
+          <span className="lut-search-icon">⌕</span>
+
+          <input
+            type="search"
+            value={searchInput}
+            onChange={(event) =>
+              setSearchInput(event.target.value)
+            }
+            placeholder="Search LUTs, styles, creators..."
+            aria-label="Search LUTs"
+          />
+
+          {searchInput && (
+            <button
+              type="button"
+              className="lut-search-clear"
+              onClick={() => setSearchInput('')}
+              aria-label="Clear search"
+            >
+              ×
+            </button>
+          )}
+        </div>
+
+        <button
+          type="button"
+          className="mobile-filter-button"
+          onClick={() =>
+            setMobileFiltersOpen(!mobileFiltersOpen)
+          }
         >
-          <option value="">All categories</option>
-          {categories.map((c) => (
-            <option key={c.id} value={c.id}>{c.name}</option>
-          ))}
-        </select>
-        <select
-          value={priceType}
-          onChange={(e) => setPriceType(e.target.value as LutFilters['priceType'])}
-          className="bg-neutral-900 border border-neutral-800 rounded px-3 py-2 text-white"
-        >
-          <option value="all">All prices</option>
-          <option value="free">Free</option>
-          <option value="premium">Premium</option>
-        </select>
+          Filters
+        </button>
       </div>
 
-      {loading && <p className="text-neutral-500 text-center py-12">Loading LUTs...</p>}
-      {error && <p className="text-red-500 text-center py-12">Failed to load LUTs: {error}</p>}
-      {!loading && !error && luts.length === 0 && (
-        <p className="text-neutral-500 text-center py-12">No LUTs match your filters.</p>
-      )}
+      <div className="lut-marketplace-layout">
+        <aside
+          className={`lut-filter-sidebar ${
+            mobileFiltersOpen
+              ? 'lut-filter-sidebar-open'
+              : ''
+          }`}
+        >
+          <div className="filter-header">
+            <h2>Filters</h2>
 
-      {!loading && !error && luts.length > 0 && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {luts.map((lut) => (
-            <Link
-              to={`/lut/${lut.id}`}
-              key={lut.id}
-              className="bg-neutral-900 border border-neutral-800 rounded-lg overflow-hidden hover:border-neutral-600 transition-colors block relative"
+            <button
+              type="button"
+              onClick={clearFilters}
             >
-              <div className="aspect-video bg-neutral-800 flex items-center justify-center text-neutral-600 text-sm">
-                {lut.cover_image ? (
-                  <img src={lut.cover_image} alt={lut.title} className="w-full h-full object-cover" />
-                ) : (
-                  'No preview'
-                )}
-              </div>
-              <div className="p-4">
-                <div className="flex items-start justify-between gap-2">
-                  <h3 className="font-serif text-lg text-white">{lut.title}</h3>
-                  <div className="flex items-center gap-2">
-                    {lut.featured && (
-                      <span className="text-xs bg-red-700 text-white px-2 py-0.5 rounded-full whitespace-nowrap">
-                        Featured
-                      </span>
-                    )}
-                    <FavoriteButton lutId={lut.id} isFavorited={favoriteIds.has(lut.id)} />
+              Clear all
+            </button>
+          </div>
+
+          <div className="filter-section">
+            <h3>Category</h3>
+
+            <button
+              type="button"
+              className={`filter-option ${
+                categoryId === ''
+                  ? 'filter-option-active'
+                  : ''
+              }`}
+              onClick={() => setCategoryId('')}
+            >
+              <span>All LUTs</span>
+            </button>
+
+            {categories.map((category) => (
+              <button
+                key={category.id}
+                type="button"
+                className={`filter-option ${
+                  categoryId === category.id
+                    ? 'filter-option-active'
+                    : ''
+                }`}
+                onClick={() =>
+                  setCategoryId(category.id)
+                }
+              >
+                <span>{category.name}</span>
+              </button>
+            ))}
+          </div>
+
+          <div className="filter-section">
+            <h3>Price</h3>
+
+            <button
+              type="button"
+              className={`filter-option ${
+                priceType === 'all'
+                  ? 'filter-option-active'
+                  : ''
+              }`}
+              onClick={() => setPriceType('all')}
+            >
+              <span>All</span>
+            </button>
+
+            <button
+              type="button"
+              className={`filter-option ${
+                priceType === 'free'
+                  ? 'filter-option-active'
+                  : ''
+              }`}
+              onClick={() => setPriceType('free')}
+            >
+              <span>Free</span>
+            </button>
+
+            <button
+              type="button"
+              className={`filter-option ${
+                priceType === 'premium'
+                  ? 'filter-option-active'
+                  : ''
+              }`}
+              onClick={() =>
+                setPriceType('premium')
+              }
+            >
+              <span>Premium</span>
+            </button>
+          </div>
+
+          <div className="filter-section">
+            <h3>Sort</h3>
+
+            <button
+              type="button"
+              className={`filter-option ${
+                sort === 'popular'
+                  ? 'filter-option-active'
+                  : ''
+              }`}
+              onClick={() => setSort('popular')}
+            >
+              Most popular
+            </button>
+
+            <button
+              type="button"
+              className={`filter-option ${
+                sort === 'newest'
+                  ? 'filter-option-active'
+                  : ''
+              }`}
+              onClick={() => setSort('newest')}
+            >
+              Newest
+            </button>
+
+            <button
+              type="button"
+              className={`filter-option ${
+                sort === 'rating'
+                  ? 'filter-option-active'
+                  : ''
+              }`}
+              onClick={() => setSort('rating')}
+            >
+              Top rated
+            </button>
+
+            <button
+              type="button"
+              className={`filter-option ${
+                sort === 'price-low'
+                  ? 'filter-option-active'
+                  : ''
+              }`}
+              onClick={() => setSort('price-low')}
+            >
+              Price: low to high
+            </button>
+
+            <button
+              type="button"
+              className={`filter-option ${
+                sort === 'price-high'
+                  ? 'filter-option-active'
+                  : ''
+              }`}
+              onClick={() =>
+                setSort('price-high')
+              }
+            >
+              Price: high to low
+            </button>
+          </div>
+        </aside>
+
+        <div className="lut-results">
+          <div className="results-header">
+            <div>
+              <p className="results-count">
+                {loading
+                  ? 'Loading LUTs...'
+                  : `${luts.length} LUT${
+                      luts.length === 1 ? '' : 's'
+                    }`}
+              </p>
+
+              {activeCategory && (
+                <span className="active-filter">
+                  {activeCategory.name}
+                </span>
+              )}
+            </div>
+
+            <div className="results-sort">
+              <label htmlFor="desktop-sort">
+                Sort by
+              </label>
+
+              <select
+                id="desktop-sort"
+                value={sort}
+                onChange={(event) =>
+                  setSort(
+                    event.target.value as SortKey
+                  )
+                }
+              >
+                <option value="popular">
+                  Most popular
+                </option>
+                <option value="newest">
+                  Newest
+                </option>
+                <option value="rating">
+                  Top rated
+                </option>
+                <option value="price-low">
+                  Price: low to high
+                </option>
+                <option value="price-high">
+                  Price: high to low
+                </option>
+              </select>
+            </div>
+          </div>
+
+          {error && (
+            <div className="lut-error">
+              <strong>Something went wrong.</strong>
+              <span>{error}</span>
+            </div>
+          )}
+
+          {loading && (
+            <div className="lut-grid">
+              {Array.from({ length: 8 }).map(
+                (_, index) => (
+                  <div
+                    key={index}
+                    className="lut-card lut-card-skeleton"
+                  >
+                    <div className="lut-card-image" />
+                    <div className="lut-card-info">
+                      <div />
+                      <div />
+                    </div>
                   </div>
+                )
+              )}
+            </div>
+          )}
+
+          {!loading &&
+            !error &&
+            luts.length === 0 && (
+              <div className="lut-empty">
+                <div className="lut-empty-symbol">
+                  ○
                 </div>
-                <p className="text-neutral-400 text-sm mt-1 line-clamp-2">{lut.description}</p>
-                <div className="flex items-center justify-between mt-3">
-                  <span className="text-white font-medium">
-                    {lut.price === 0 ? 'Free' : `KES ${lut.price.toLocaleString()}`}
-                  </span>
-                  <span className="text-neutral-500 text-sm">★ {lut.rating.toFixed(1)}</span>
-                </div>
+
+                <h3>No LUTs found</h3>
+
+                <p>
+                  Try changing your search or filters.
+                </p>
+
+                <button
+                  type="button"
+                  onClick={clearFilters}
+                >
+                  Clear filters
+                </button>
               </div>
-            </Link>
-          ))}
+            )}
+
+          {!loading &&
+            !error &&
+            luts.length > 0 && (
+              <div className="lut-grid">
+                {luts.map((lut) => (
+  <article
+    key={lut.id}
+    className="lut-card"
+  >
+    <Link
+      to={`/lut/${lut.id}`}
+      className="lut-card-preview"
+    >
+      <div
+        className="lut-card-image"
+        style={{
+          background: gradientForStyle(lut.style),
+        }}
+      >
+        {lut.preview_video ? (
+          <video
+            src={lut.preview_video}
+            muted
+            loop
+            autoPlay
+            playsInline
+            preload="metadata"
+            className="lut-card-media"
+          />
+        ) : lut.preview_image ? (
+          <img
+            src={lut.preview_image}
+            alt={lut.title}
+            loading="lazy"
+            className="lut-card-media"
+          />
+        ) : lut.cover_image ? (
+          <img
+            src={lut.cover_image}
+            alt={lut.title}
+            loading="lazy"
+            className="lut-card-media"
+          />
+        ) : null}
+
+        <div className="lut-card-overlay" />
+
+        <div className="lut-card-badge">
+          {lut.price === 0 ? 'FREE' : 'PREMIUM'}
         </div>
-      )}
+
+        <div className="lut-card-view">
+          View LUT
+        </div>
+      </div>
+    </Link>
+
+    <div className="lut-card-content">
+      <div className="lut-card-title-row">
+        <Link
+          to={`/lut/${lut.id}`}
+          className="lut-card-title"
+        >
+          {lut.title}
+        </Link>
+
+        {user && (
+          <FavoriteButton
+            lutId={lut.id}
+            isFavorited={favoriteIds.has(lut.id)}
+          />
+        )}
+      </div>
+
+      <div className="lut-card-meta">
+        <span>
+          {lut.author || 'Bold Unity'}
+        </span>
+
+        <span>·</span>
+
+        <span>
+          ★ {lut.rating?.toFixed(1) ?? '0.0'}
+        </span>
+      </div>
+
+      <div className="lut-card-bottom">
+        <span className="lut-card-downloads">
+          {lut.downloads ?? 0} downloads
+        </span>
+
+        <span className="lut-card-price">
+          {lut.price === 0
+            ? 'FREE'
+            : `KES ${lut.price.toLocaleString()}`}
+        </span>
+      </div>
     </div>
+  </article>
+))}
+              </div>
+            )}
+        </div>
+      </div>
+    </section>
   )
 }
