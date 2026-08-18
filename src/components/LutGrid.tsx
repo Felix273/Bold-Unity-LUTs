@@ -30,6 +30,7 @@ export default function LutGrid() {
   const [search, setSearch] = useState('')
 
   const [categoryId, setCategoryId] = useState('')
+  const [software, setSoftware] = useState('')
   const [priceType, setPriceType] = useState<
     'all' | 'free' | 'premium'
   >('all')
@@ -54,14 +55,27 @@ export default function LutGrid() {
   }, [])
 
   useEffect(() => {
-    if (!user) {
-      setFavoriteIds(new Set())
-      return
+    let mounted = true
+
+    async function loadFavorites() {
+      if (!user) {
+        if (mounted) setFavoriteIds(new Set())
+        return
+      }
+
+      try {
+        const ids = await fetchFavoriteIds(user.id)
+        if (mounted) setFavoriteIds(ids)
+      } catch {
+        if (mounted) setFavoriteIds(new Set())
+      }
     }
 
-    fetchFavoriteIds(user.id)
-      .then(setFavoriteIds)
-      .catch(() => setFavoriteIds(new Set()))
+    loadFavorites()
+
+    return () => {
+      mounted = false
+    }
   }, [user])
 
   useEffect(() => {
@@ -74,6 +88,7 @@ export default function LutGrid() {
       const filters: LutFilters = {
         search: search || undefined,
         categoryId: categoryId || undefined,
+        software: software || undefined,
         priceType,
         sort,
         page: 1,
@@ -106,7 +121,7 @@ export default function LutGrid() {
     return () => {
       mounted = false
     }
-  }, [search, categoryId, priceType, sort])
+  }, [search, categoryId, software, priceType, sort])
 
   const activeCategory = categories.find(
     (category) => category.id === categoryId
@@ -116,6 +131,7 @@ export default function LutGrid() {
     setSearchInput('')
     setSearch('')
     setCategoryId('')
+    setSoftware('')
     setPriceType('all')
     setSort('popular')
   }
@@ -176,6 +192,29 @@ export default function LutGrid() {
             >
               Clear all
             </button>
+          </div>
+
+          <div className="filter-section">
+            <h3>Software</h3>
+
+            {[
+              { label: 'All Software', value: '' },
+              { label: 'Premiere Pro', value: 'Premiere Pro' },
+              { label: 'DaVinci Resolve', value: 'DaVinci Resolve' },
+              { label: 'Final Cut Pro', value: 'Final Cut Pro' },
+              { label: 'Photoshop / Lightroom', value: 'Photoshop' },
+            ].map((sw) => (
+              <button
+                key={sw.value}
+                type="button"
+                className={`filter-option ${
+                  software === sw.value ? 'filter-option-active' : ''
+                }`}
+                onClick={() => setSoftware(sw.value)}
+              >
+                <span>{sw.label}</span>
+              </button>
+            ))}
           </div>
 
           <div className="filter-section">
@@ -332,8 +371,13 @@ export default function LutGrid() {
               </p>
 
               {activeCategory && (
-                <span className="active-filter">
+                <span className="active-filter" style={{ marginRight: '6px' }}>
                   {activeCategory.name}
+                </span>
+              )}
+              {software && (
+                <span className="active-filter">
+                  {software}
                 </span>
               )}
             </div>
