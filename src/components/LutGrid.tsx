@@ -545,10 +545,30 @@ export default function LutGrid() {
 
         <span>·</span>
 
-        <span>
+        <span style={{ color: '#e8e4dd', fontWeight: 600 }}>
           ★ {lut.rating?.toFixed(1) ?? '0.0'}
         </span>
       </div>
+
+      {lut.compatibility && lut.compatibility.length > 0 && (
+        <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginTop: '8px' }}>
+          {lut.compatibility.slice(0, 3).map((app) => (
+            <span
+              key={app}
+              style={{
+                fontSize: '9px',
+                background: '#1a1a1a',
+                color: '#8a8580',
+                padding: '2px 6px',
+                border: '1px solid #2a2a2a',
+                fontFamily: 'DM Mono, monospace',
+              }}
+            >
+              {app}
+            </span>
+          ))}
+        </div>
+      )}
 
       <div className="lut-card-bottom">
         <span className="lut-card-downloads">

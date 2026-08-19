@@ -104,18 +104,18 @@ export default function LutDetail() {
   }
 
   if (loading) {
-    return <p className="text-neutral-400 text-center py-20">Loading LUT details...</p>
+    return <p className="text-[#8a8580] text-center py-20 uppercase tracking-widest text-xs">Loading LUT details...</p>
   }
 
   if (error) {
-    return <p className="text-red-500 text-center py-20">Failed to load LUT: {error}</p>
+    return <p className="text-[#c8102e] text-center py-20">Failed to load LUT: {error}</p>
   }
 
   if (!lut) {
     return (
       <div className="text-center py-20">
-        <p className="text-neutral-500 mb-4">LUT not found.</p>
-        <Link to="/" className="text-amber-500 hover:text-amber-400 underline">
+        <p className="text-[#8a8580] mb-4">LUT not found.</p>
+        <Link to="/" className="text-[#c8102e] hover:underline uppercase text-xs tracking-widest font-bold">
           Back to catalog
         </Link>
       </div>
@@ -128,7 +128,7 @@ export default function LutDetail() {
     <div className="max-w-6xl mx-auto py-8 px-4">
       <Link
         to="/"
-        className="text-neutral-400 hover:text-white text-sm mb-8 inline-flex items-center gap-2 transition-colors"
+        className="text-[#8a8580] hover:text-[#f5f2ed] text-xs uppercase tracking-widest mb-8 inline-flex items-center gap-2 transition-colors font-medium"
       >
         ← Back to Catalog
       </Link>
@@ -143,18 +143,18 @@ export default function LutDetail() {
             alt={lut.title}
           />
 
-          <p className="text-xs text-neutral-400 text-center italic">
+          <p className="text-xs text-[#8a8580] text-center italic">
             Drag the slider above to compare the original clip against the color-graded LUT.
           </p>
 
           {/* TAB SYSTEM: Specs & Installation Guide */}
-          <div className="border border-neutral-800 rounded-xl bg-neutral-900/60 p-6 space-y-4">
-            <div className="flex border-b border-neutral-800 pb-3 gap-6 text-sm font-medium">
+          <div className="border border-[#222] bg-[#111] p-6 space-y-4">
+            <div className="flex border-b border-[#222] pb-3 gap-6 text-xs uppercase tracking-widest font-semibold">
               <button
                 className={`pb-2 transition-colors ${
                   activeTab === 'specs'
-                    ? 'text-white border-b-2 border-amber-500'
-                    : 'text-neutral-400 hover:text-neutral-200'
+                    ? 'text-[#f5f2ed] border-b-2 border-[#c8102e]'
+                    : 'text-[#8a8580] hover:text-white'
                 }`}
                 onClick={() => setActiveTab('specs')}
               >
@@ -163,8 +163,8 @@ export default function LutDetail() {
               <button
                 className={`pb-2 transition-colors ${
                   activeTab === 'guide'
-                    ? 'text-white border-b-2 border-amber-500'
-                    : 'text-neutral-400 hover:text-neutral-200'
+                    ? 'text-[#f5f2ed] border-b-2 border-[#c8102e]'
+                    : 'text-[#8a8580] hover:text-white'
                 }`}
                 onClick={() => setActiveTab('guide')}
               >
@@ -174,45 +174,45 @@ export default function LutDetail() {
 
             {activeTab === 'specs' ? (
               <div className="grid grid-cols-2 gap-4 text-xs">
-                <div className="bg-neutral-950 p-3 rounded-lg border border-neutral-800/60">
-                  <span className="text-neutral-500 block uppercase tracking-wider">Format</span>
-                  <span className="text-neutral-200 font-mono text-sm mt-0.5 block">.CUBE (3D LUT)</span>
+                <div className="bg-[#0a0a0a] p-3 border border-[#222]">
+                  <span className="text-[#8a8580] block uppercase tracking-wider text-[10px]">Format</span>
+                  <span className="text-[#f5f2ed] font-mono text-sm mt-0.5 block font-bold">.CUBE (3D LUT)</span>
                 </div>
-                <div className="bg-neutral-950 p-3 rounded-lg border border-neutral-800/60">
-                  <span className="text-neutral-500 block uppercase tracking-wider">Rec. Target</span>
-                  <span className="text-neutral-200 font-mono text-sm mt-0.5 block">
+                <div className="bg-[#0a0a0a] p-3 border border-[#222]">
+                  <span className="text-[#8a8580] block uppercase tracking-wider text-[10px]">Rec. Target</span>
+                  <span className="text-[#f5f2ed] font-mono text-sm mt-0.5 block font-bold">
                     {lut.output_color_space || 'Rec.709 / Standard'}
                   </span>
                 </div>
-                <div className="bg-neutral-950 p-3 rounded-lg border border-neutral-800/60">
-                  <span className="text-neutral-500 block uppercase tracking-wider">Input Space</span>
-                  <span className="text-neutral-200 font-mono text-sm mt-0.5 block">
+                <div className="bg-[#0a0a0a] p-3 border border-[#222]">
+                  <span className="text-[#8a8580] block uppercase tracking-wider text-[10px]">Input Space</span>
+                  <span className="text-[#f5f2ed] font-mono text-sm mt-0.5 block font-bold">
                     {lut.input_color_space || 'LOG / Rec.709'}
                   </span>
                 </div>
-                <div className="bg-neutral-950 p-3 rounded-lg border border-neutral-800/60">
-                  <span className="text-neutral-500 block uppercase tracking-wider">Recommended Opacity</span>
-                  <span className="text-neutral-200 font-mono text-sm mt-0.5 block">
+                <div className="bg-[#0a0a0a] p-3 border border-[#222]">
+                  <span className="text-[#8a8580] block uppercase tracking-wider text-[10px]">Recommended Opacity</span>
+                  <span className="text-[#f5f2ed] font-mono text-sm mt-0.5 block font-bold">
                     {lut.intensity || '80% - 100%'}
                   </span>
                 </div>
               </div>
             ) : (
-              <div className="space-y-4 text-xs text-neutral-300">
+              <div className="space-y-4 text-xs text-[#e8e4dd]">
                 <div>
-                  <h4 className="font-semibold text-amber-400 mb-1">Adobe Premiere Pro</h4>
-                  <ol className="list-decimal list-inside space-y-1 text-neutral-400">
+                  <h4 className="font-semibold text-[#c8102e] uppercase tracking-wider mb-1">Adobe Premiere Pro</h4>
+                  <ol className="list-decimal list-inside space-y-1 text-[#8a8580]">
                     <li>Open Lumetri Color panel → Creative tab.</li>
                     <li>Click the Look dropdown menu and select Browse...</li>
-                    <li>Choose your downloaded <code className="text-neutral-200">.cube</code> file.</li>
+                    <li>Choose your downloaded <code className="text-[#f5f2ed]">.cube</code> file.</li>
                   </ol>
                 </div>
                 <div>
-                  <h4 className="font-semibold text-amber-400 mb-1">DaVinci Resolve</h4>
-                  <ol className="list-decimal list-inside space-y-1 text-neutral-400">
+                  <h4 className="font-semibold text-[#c8102e] uppercase tracking-wider mb-1">DaVinci Resolve</h4>
+                  <ol className="list-decimal list-inside space-y-1 text-[#8a8580]">
                     <li>Open the Color Page → LUTs sidebar tab.</li>
                     <li>Right click empty area → Open Folder.</li>
-                    <li>Paste the downloaded <code className="text-neutral-200">.cube</code> file and click Refresh.</li>
+                    <li>Paste the downloaded <code className="text-[#f5f2ed]">.cube</code> file and click Refresh.</li>
                   </ol>
                 </div>
               </div>
@@ -224,48 +224,48 @@ export default function LutDetail() {
         <div className="lg:col-span-5 space-y-6">
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-mono tracking-widest text-neutral-500 uppercase">
+              <span className="text-xs font-mono tracking-widest text-[#c8102e] uppercase font-semibold">
                 {lut.style || 'Cinematic Grade'}
               </span>
               <FavoriteButton lutId={lut.id} isFavorited={isFavorited} size="lg" />
             </div>
 
-            <h1 className="text-3xl font-serif text-white">{lut.title}</h1>
+            <h1 className="text-3xl md:text-4xl font-serif font-bold text-[#f5f2ed]">{lut.title}</h1>
 
-            <p className="text-sm text-neutral-400">Created by {lut.author || 'Bold Unity Master Lab'}</p>
+            <p className="text-xs text-[#8a8580] uppercase tracking-widest">Created by {lut.author || 'Bold Unity Creative'}</p>
           </div>
 
-          <p className="text-sm text-neutral-300 leading-relaxed bg-neutral-900/40 p-4 rounded-xl border border-neutral-800">
+          <p className="text-sm text-[#e8e4dd] leading-relaxed bg-[#111] p-4 border border-[#222]">
             {lut.description || 'Professional cinematic color preset engineered for modern digital cinema standards.'}
           </p>
 
-          <div className="flex items-center gap-6 py-2 border-y border-neutral-800 text-sm text-neutral-400">
+          <div className="flex items-center gap-6 py-3 border-y border-[#222] text-sm text-[#8a8580]">
             <div>
-              <span className="text-amber-400 font-bold">★ {lut.rating?.toFixed(1) ?? '4.9'}</span>
-              <span className="text-xs text-neutral-500 block">Rating</span>
+              <span className="text-[#f5f2ed] font-bold">★ {lut.rating?.toFixed(1) ?? '4.9'}</span>
+              <span className="text-[10px] uppercase tracking-wider text-[#8a8580] block">Rating</span>
             </div>
-            <div className="h-8 w-px bg-neutral-800" />
+            <div className="h-8 w-px bg-[#222]" />
             <div>
-              <span className="text-white font-semibold">{lut.downloads ?? 0}</span>
-              <span className="text-xs text-neutral-500 block">Downloads</span>
+              <span className="text-[#f5f2ed] font-bold">{lut.downloads ?? 0}</span>
+              <span className="text-[10px] uppercase tracking-wider text-[#8a8580] block">Downloads</span>
             </div>
-            <div className="h-8 w-px bg-neutral-800" />
+            <div className="h-8 w-px bg-[#222]" />
             <div>
-              <span className="text-white font-semibold">{lut.compatibility?.length ? lut.compatibility.length : 4}+</span>
-              <span className="text-xs text-neutral-500 block">Host Apps</span>
+              <span className="text-[#f5f2ed] font-bold">{lut.compatibility?.length ? lut.compatibility.length : 4}+</span>
+              <span className="text-[10px] uppercase tracking-wider text-[#8a8580] block">Host Apps</span>
             </div>
           </div>
 
           {lut.compatibility && lut.compatibility.length > 0 && (
             <div>
-              <span className="text-xs text-neutral-500 block mb-2 font-mono uppercase tracking-wider">
+              <span className="text-[10px] text-[#8a8580] block mb-2 font-mono uppercase tracking-widest">
                 Compatible Host Applications
               </span>
               <div className="flex flex-wrap gap-2">
                 {lut.compatibility.map((app) => (
                   <span
                     key={app}
-                    className="text-xs bg-neutral-800/80 text-neutral-300 px-3 py-1 rounded-md border border-neutral-700/50"
+                    className="text-xs bg-[#181818] text-[#e8e4dd] px-3 py-1 border border-[#333] font-mono"
                   >
                     {app}
                   </span>
@@ -275,10 +275,10 @@ export default function LutDetail() {
           )}
 
           {/* DOWNLOAD / BUY ACTION CARD */}
-          <div className="bg-neutral-900 p-6 rounded-2xl border border-neutral-800 space-y-4 shadow-xl">
+          <div className="bg-[#111] p-6 border border-[#222] space-y-4 shadow-2xl">
             <div className="flex items-baseline justify-between">
-              <span className="text-xs text-neutral-400 uppercase tracking-widest font-mono">License Price</span>
-              <span className="text-3xl font-bold text-white">
+              <span className="text-xs text-[#8a8580] uppercase tracking-widest font-mono">License Price</span>
+              <span className="text-3xl font-bold text-[#f5f2ed]">
                 {isFree ? 'FREE' : `KES ${lut.price.toLocaleString()}`}
               </span>
             </div>
@@ -286,23 +286,23 @@ export default function LutDetail() {
             {isFree ? (
               !user ? (
                 <div className="space-y-2">
-                  <p className="text-xs text-neutral-400 text-center">Sign in to claim your free LUT download</p>
+                  <p className="text-xs text-[#8a8580] text-center">Sign in to claim your free LUT download</p>
                   <Link
                     to="/"
-                    className="block w-full text-center bg-white hover:bg-neutral-200 text-black font-semibold rounded-xl py-3 text-sm transition-colors"
+                    className="block w-full text-center bg-[#f5f2ed] hover:bg-white text-black font-bold uppercase tracking-widest py-3.5 text-xs transition-colors"
                   >
                     Sign In to Download
                   </Link>
                 </div>
               ) : downloaded ? (
-                <div className="bg-emerald-950/60 border border-emerald-800 text-emerald-300 p-3 rounded-xl text-center text-sm font-medium">
+                <div className="bg-[#182218] border border-emerald-800 text-emerald-400 p-3 text-center text-xs font-mono uppercase tracking-widest font-bold">
                   ✓ File Downloaded (.CUBE file saved)
                 </div>
               ) : (
                 <button
                   onClick={handleDownload}
                   disabled={downloading}
-                  className="w-full bg-amber-500 hover:bg-amber-400 text-black font-semibold rounded-xl py-3.5 text-sm disabled:opacity-50 transition-colors shadow-lg shadow-amber-500/20"
+                  className="w-full bg-[#c8102e] hover:bg-[#a00b23] text-white font-bold uppercase tracking-widest py-4 text-xs disabled:opacity-50 transition-colors shadow-lg shadow-red-900/20"
                 >
                   {downloading ? 'Preparing File...' : 'Download .CUBE Pack Now'}
                 </button>
@@ -310,29 +310,29 @@ export default function LutDetail() {
             ) : (
               <button
                 onClick={handleDownload}
-                className="w-full bg-amber-500 hover:bg-amber-400 text-black font-semibold rounded-xl py-3.5 text-sm transition-colors shadow-lg shadow-amber-500/20"
+                className="w-full bg-[#c8102e] hover:bg-[#a00b23] text-white font-bold uppercase tracking-widest py-4 text-xs transition-colors shadow-lg shadow-red-900/20"
               >
                 Buy & Download (.CUBE)
               </button>
             )}
 
-            {downloadError && <p className="text-red-500 text-xs text-center">{downloadError}</p>}
+            {downloadError && <p className="text-[#c8102e] text-xs text-center">{downloadError}</p>}
           </div>
         </div>
       </div>
 
       {/* RELATED LUTS */}
       {relatedLuts.length > 0 && (
-        <div className="mt-20 border-t border-neutral-800 pt-12">
-          <h3 className="text-xl font-serif text-white mb-6">More Cinematic Look Presets</h3>
+        <div className="mt-20 border-t border-[#222] pt-12">
+          <h3 className="text-2xl font-serif font-bold text-[#f5f2ed] mb-6">More Cinematic Look Presets</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             {relatedLuts.map((rel) => (
               <Link
                 key={rel.id}
                 to={`/lut/${rel.id}`}
-                className="group bg-neutral-900 border border-neutral-800 rounded-xl overflow-hidden hover:border-neutral-700 transition-all"
+                className="group bg-[#111] border border-[#222] overflow-hidden hover:border-[#c8102e] transition-all"
               >
-                <div className="aspect-video relative overflow-hidden bg-neutral-950">
+                <div className="aspect-video relative overflow-hidden bg-black">
                   {rel.cover_image && (
                     <img
                       src={rel.cover_image}
@@ -340,15 +340,15 @@ export default function LutDetail() {
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                   )}
-                  <span className="absolute top-2 left-2 bg-black/70 text-white text-[10px] font-mono px-2 py-0.5 rounded border border-white/10">
+                  <span className="absolute top-2 left-2 bg-[#c8102e] text-white text-[9px] font-mono font-bold px-2 py-0.5 uppercase tracking-widest">
                     {rel.price === 0 ? 'FREE' : 'PREMIUM'}
                   </span>
                 </div>
                 <div className="p-4">
-                  <h4 className="text-sm font-medium text-white group-hover:text-amber-400 transition-colors">
+                  <h4 className="text-sm font-serif font-bold text-[#f5f2ed] group-hover:text-[#c8102e] transition-colors">
                     {rel.title}
                   </h4>
-                  <p className="text-xs text-neutral-500 mt-1">{rel.author || 'Bold Unity'}</p>
+                  <p className="text-xs text-[#8a8580] mt-1">by {rel.author || 'Bold Unity'}</p>
                 </div>
               </Link>
             ))}
