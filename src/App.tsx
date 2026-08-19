@@ -27,7 +27,7 @@ function CatalogPage({ onOpenPricing }: { onOpenPricing: () => void }) {
         <div>
           <button
             onClick={onOpenPricing}
-            className="bg-amber-500 hover:bg-amber-400 text-black font-semibold text-xs px-5 py-3 rounded-xl transition-all shadow-lg shadow-amber-500/10 uppercase tracking-wider"
+            className="bg-[#c8102e] hover:bg-[#a00b23] text-white font-semibold text-xs px-6 py-3.5 transition-all shadow-lg shadow-red-900/20 uppercase tracking-widest"
           >
             Get Unlimited Access
           </button>
@@ -80,7 +80,7 @@ function Header({
 
           <button
             onClick={onOpenPricing}
-            className="hover:text-white transition-colors text-xs text-neutral-400 bg-transparent border-0 cursor-pointer"
+            className="hover:text-white transition-colors text-xs text-[#8a8580] bg-transparent border-0 cursor-pointer uppercase tracking-widest"
           >
             Pricing & Membership
           </button>
@@ -92,14 +92,14 @@ function Header({
               <div className="marketplace-user">
                 <Link
                   to="/account"
-                  className="text-xs font-mono uppercase bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 text-neutral-200 px-3 py-1.5 rounded-full transition-colors"
+                  className="text-xs font-mono uppercase bg-[#181818] hover:bg-[#222] border border-[#333] text-[#f5f2ed] px-3 py-1.5 transition-colors"
                 >
                   {profile?.plan ?? 'Free Plan'}
                 </Link>
 
                 <button
                   onClick={() => navigate('/account')}
-                  className="text-xs text-neutral-300 hover:text-white"
+                  className="text-xs text-[#8a8580] hover:text-white"
                 >
                   Account
                 </button>
@@ -159,14 +159,14 @@ function App() {
 
       <footer className="marketplace-footer">
         <div>
-          <strong>BOLD UNITY MASTER LABS</strong>
+          <strong>BOLD UNITY CREATIVE</strong>
           <span>
-            Cinematic LUTs and color grading tools for Premiere Pro, DaVinci Resolve, and Final Cut Pro.
+            Cinematic storytelling tools & color grading presets for modern creators.
           </span>
         </div>
 
         <span>
-          © {new Date().getFullYear()} Bold Unity
+          © {new Date().getFullYear()} Bold Unity Creative
         </span>
       </footer>
 

@@ -136,8 +136,8 @@ const SAMPLE_LUTS: Lut[] = [
   }
 ]
 
-async function withTimeout<T>(promise: Promise<T>, ms = 800): Promise<T> {
-  let timer: any
+async function withTimeout<T>(promise: PromiseLike<T>, ms = 800): Promise<T> {
+  let timer: ReturnType<typeof setTimeout>
   const timeoutPromise = new Promise<never>((_, reject) => {
     timer = setTimeout(() => reject(new Error('Timeout')), ms)
   })
@@ -199,7 +199,7 @@ export async function fetchLuts(filters: LutFilters = {}): Promise<Lut[]> {
         break
     }
 
-    const res = await withTimeout(query) as any
+    const res = await withTimeout(query)
     const data = res.data
 
     if (res.error || !data || data.length === 0) {
@@ -260,7 +260,7 @@ export async function fetchFreeLuts(): Promise<Lut[]> {
 
 export async function fetchLutById(id: string): Promise<Lut | null> {
   try {
-    const res = await withTimeout(supabase.from('luts').select('*').eq('id', id).single()) as any
+    const res = await withTimeout(supabase.from('luts').select('*').eq('id', id).single())
     const data = res.data
 
     if (res.error || !data) {
@@ -275,9 +275,11 @@ export async function fetchLutById(id: string): Promise<Lut | null> {
 
 export async function downloadFreeLut(lutId: string) {
   try {
-    const res = await withTimeout(supabase.rpc('record_free_download', {
-      p_lut_id: lutId,
-    })) as any
+    const res = await withTimeout(
+      supabase.rpc('record_free_download', {
+        p_lut_id: lutId,
+      })
+    )
 
     if (res.error) {
       return true

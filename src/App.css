@@ -1,11 +1,13 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600&family=Playfair+Display:wght@500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
 
 :root {
-  font-family: 'Inter', sans-serif;
-  color: #f4f4f2;
-  background: #0b0b0b;
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
+  --black: #0a0a0a;
+  --white: #f5f2ed;
+  --red: #c8102e;
+  --gray: #8a8580;
+  --light-gray: #e8e4dd;
+  --font-serif: 'Playfair Display', 'Georgia', serif;
+  --font-sans: 'Inter', 'Helvetica Neue', 'Arial', sans-serif;
 }
 
 * {
@@ -19,8 +21,9 @@ html {
 body {
   margin: 0;
   min-width: 320px;
-  background: #0b0b0b;
-  color: #f4f4f2;
+  background: var(--black);
+  color: var(--white);
+  font-family: var(--font-sans);
 }
 
 button,
@@ -39,22 +42,17 @@ a {
 }
 
 /* =========================================================
-   APP
+   APP CONTAINER
    ========================================================= */
 
 .app {
   min-height: 100vh;
-  background:
-    radial-gradient(
-      circle at 50% -20%,
-      rgba(255, 255, 255, 0.045),
-      transparent 35%
-    ),
-    #0b0b0b;
+  background: var(--black);
+  color: var(--white);
 }
 
 /* =========================================================
-   HEADER
+   HEADER & NAVIGATION
    ========================================================= */
 
 .marketplace-header {
@@ -62,12 +60,12 @@ a {
   top: 0;
   z-index: 100;
 
-  height: 72px;
+  height: 76px;
 
-  border-bottom: 1px solid #202020;
+  border-bottom: 1px solid rgba(245, 242, 237, 0.12);
 
-  background: rgba(11, 11, 11, 0.94);
-  backdrop-filter: blur(18px);
+  background: rgba(10, 10, 10, 0.92);
+  backdrop-filter: blur(20px);
 }
 
 .marketplace-header-inner {
@@ -83,104 +81,120 @@ a {
 .marketplace-brand {
   display: flex;
   align-items: center;
-  gap: 11px;
+  gap: 12px;
 
-  min-width: 190px;
+  min-width: 200px;
 }
 
 .marketplace-brand-symbol {
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
 
   display: grid;
   place-items: center;
 
-  border: 1px solid #404040;
-  border-radius: 50%;
+  background: var(--red);
+  border-radius: 4px;
 
-  color: #fff;
+  color: #ffffff;
 
-  font-family: 'DM Mono', monospace;
-  font-size: 9px;
-  font-weight: 500;
-  letter-spacing: -0.08em;
+  font-family: var(--font-serif);
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.05em;
 }
 
 .marketplace-brand-name {
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.18em;
+  font-family: var(--font-serif);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  color: var(--white);
+  text-transform: uppercase;
 }
 
 .marketplace-nav {
   display: flex;
   align-items: center;
-  gap: 30px;
+  gap: 36px;
 
-  color: #8c8c8c;
+  color: var(--gray);
 
-  font-size: 12px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 2px;
+  text-transform: uppercase;
 }
 
-.marketplace-nav a {
-  transition: color 160ms ease;
+.marketplace-nav a,
+.marketplace-nav button {
+  transition: color 180ms ease;
 }
 
 .marketplace-nav a:hover,
+.marketplace-nav button:hover,
 .marketplace-nav-active {
-  color: #fff;
+  color: var(--white) !important;
 }
 
 .marketplace-account {
-  min-width: 190px;
+  min-width: 200px;
 
   display: flex;
   justify-content: flex-end;
 }
 
 .marketplace-signin {
-  padding: 8px 17px;
+  padding: 10px 22px;
 
-  border: 1px solid #343434;
-  border-radius: 999px;
+  border: 1px solid var(--white);
+  border-radius: 0px;
 
-  color: #ddd;
+  background: transparent;
+  color: var(--white);
 
-  font-size: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
 
   transition:
-    background 160ms ease,
-    border-color 160ms ease;
+    background 180ms ease,
+    color 180ms ease;
 }
 
 .marketplace-signin:hover {
-  background: #191919;
-  border-color: #555;
+  background: var(--white);
+  color: var(--black);
 }
 
 .marketplace-user {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 16px;
 
-  color: #888;
+  color: var(--gray);
   font-size: 11px;
 }
 
 .marketplace-user button {
-  padding: 8px 14px;
+  padding: 8px 16px;
 
-  border: 1px solid #343434;
-  border-radius: 999px;
+  border: 1px solid rgba(245, 242, 237, 0.2);
+  border-radius: 0px;
 
   background: transparent;
-  color: #ccc;
+  color: var(--white);
 
-  font-size: 11px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
 }
 
 .marketplace-user button:hover {
-  background: #1b1b1b;
+  border-color: var(--red);
+  background: var(--red);
   color: #fff;
 }
 
@@ -194,44 +208,46 @@ a {
 }
 
 /* =========================================================
-   CATALOG HEADER
+   CATALOG HEADER / HERO
    ========================================================= */
 
 .marketplace-heading {
-  padding: 66px 0 42px;
+  padding: 72px 0 48px;
 
-  border-bottom: 1px solid #202020;
+  border-bottom: 1px solid rgba(245, 242, 237, 0.12);
 }
 
 .marketplace-kicker {
   margin-bottom: 16px;
 
-  color: #777;
+  color: var(--red);
 
   font-family: 'DM Mono', monospace;
-  font-size: 9px;
-  letter-spacing: 0.22em;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
 }
 
 .marketplace-heading h1 {
   margin: 0;
 
-  color: #f4f4f2;
+  color: var(--white);
 
-  font-family: 'Playfair Display', serif;
-  font-size: clamp(48px, 5vw, 72px);
-  font-weight: 500;
-  line-height: 0.98;
-  letter-spacing: -0.045em;
+  font-family: var(--font-serif);
+  font-size: clamp(52px, 5.5vw, 84px);
+  font-weight: 700;
+  line-height: 0.95;
+  letter-spacing: -0.03em;
 }
 
 .marketplace-heading p {
   margin: 20px 0 0;
 
-  color: #777;
+  color: var(--gray);
 
-  font-size: 14px;
-  line-height: 1.7;
+  font-size: 16px;
+  line-height: 1.6;
 }
 
 /* =========================================================
@@ -239,50 +255,50 @@ a {
    ========================================================= */
 
 .lut-marketplace {
-  padding: 30px 0 100px;
+  padding: 36px 0 120px;
 }
 
 /* =========================================================
-   SEARCH
+   SEARCH TOOLBAR
    ========================================================= */
 
 .lut-toolbar {
   display: flex;
-  gap: 12px;
-  margin-bottom: 30px;
+  gap: 14px;
+  margin-bottom: 36px;
 }
 
 .lut-search {
   position: relative;
   flex: 1;
 
-  height: 48px;
+  height: 52px;
 
-  border: 1px solid #303030;
-  border-radius: 3px;
+  border: 1px solid rgba(245, 242, 237, 0.2);
+  border-radius: 0px;
 
-  background: #111;
+  background: #121212;
 
   display: flex;
   align-items: center;
 
   transition:
-    border-color 160ms ease,
-    background 160ms ease;
+    border-color 200ms ease,
+    background 200ms ease;
 }
 
 .lut-search:focus-within {
-  border-color: #555;
-  background: #141414;
+  border-color: var(--red);
+  background: #161616;
 }
 
 .lut-search-icon {
-  width: 52px;
+  width: 56px;
 
   display: grid;
   place-items: center;
 
-  color: #666;
+  color: var(--gray);
 
   font-size: 22px;
   line-height: 1;
@@ -297,43 +313,46 @@ a {
   outline: 0;
 
   background: transparent;
-  color: #eee;
+  color: var(--white);
 
-  font-size: 13px;
+  font-size: 14px;
+  font-weight: 400;
 }
 
 .lut-search input::placeholder {
-  color: #5d5d5d;
+  color: #666;
 }
 
 .lut-search-clear {
-  width: 46px;
+  width: 48px;
   height: 100%;
 
   border: 0;
   background: transparent;
 
-  color: #777;
+  color: var(--gray);
 
-  font-size: 20px;
+  font-size: 22px;
 }
 
 .lut-search-clear:hover {
-  color: #fff;
+  color: var(--white);
 }
 
 .mobile-filter-button {
   display: none;
 
-  padding: 0 20px;
+  padding: 0 24px;
 
-  border: 1px solid #303030;
-  border-radius: 3px;
+  border: 1px solid rgba(245, 242, 237, 0.2);
 
-  background: #111;
-  color: #ddd;
+  background: #121212;
+  color: var(--white);
 
-  font-size: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
 }
 
 /* =========================================================
@@ -342,8 +361,8 @@ a {
 
 .lut-marketplace-layout {
   display: grid;
-  grid-template-columns: 210px minmax(0, 1fr);
-  gap: 38px;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 42px;
 }
 
 /* =========================================================
@@ -354,11 +373,11 @@ a {
   align-self: start;
 
   position: sticky;
-  top: 102px;
+  top: 108px;
 
-  padding-right: 25px;
+  padding-right: 28px;
 
-  border-right: 1px solid #202020;
+  border-right: 1px solid rgba(245, 242, 237, 0.1);
 }
 
 .filter-header {
@@ -372,10 +391,12 @@ a {
 .filter-header h2 {
   margin: 0;
 
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
+  font-family: var(--font-serif);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
+  color: var(--white);
 }
 
 .filter-header button {
@@ -384,13 +405,15 @@ a {
   border: 0;
   background: transparent;
 
-  color: #666;
+  color: var(--gray);
 
   font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
 }
 
 .filter-header button:hover {
-  color: #fff;
+  color: var(--red);
 }
 
 .filter-section {
@@ -398,13 +421,13 @@ a {
 }
 
 .filter-section h3 {
-  margin: 0 0 13px;
+  margin: 0 0 14px;
 
-  color: #777;
+  color: var(--gray);
 
   font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.12em;
+  font-weight: 600;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
 }
 
@@ -418,7 +441,7 @@ a {
   border: 0;
   background: transparent;
 
-  color: #777;
+  color: #9a9590;
 
   display: flex;
   align-items: center;
@@ -426,6 +449,7 @@ a {
   text-align: left;
 
   font-size: 12px;
+  font-weight: 500;
 
   transition:
     color 160ms ease,
@@ -433,13 +457,15 @@ a {
 }
 
 .filter-option:hover {
-  color: #ddd;
-  padding-left: 4px;
+  color: var(--white);
+  padding-left: 6px;
 }
 
 .filter-option-active {
-  color: #fff;
-  font-weight: 500;
+  color: var(--white);
+  font-weight: 700;
+  border-left: 2px solid var(--red);
+  padding-left: 8px !important;
 }
 
 /* =========================================================
@@ -452,7 +478,7 @@ a {
 
 .results-header {
   min-height: 38px;
-  margin-bottom: 22px;
+  margin-bottom: 24px;
 
   display: flex;
   align-items: flex-start;
@@ -463,54 +489,60 @@ a {
 .results-count {
   margin: 0;
 
-  color: #aaa;
+  color: var(--gray);
 
   font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 1px;
 }
 
 .active-filter {
   display: inline-block;
 
-  margin-top: 7px;
-  padding: 4px 8px;
+  margin-top: 8px;
+  padding: 4px 10px;
 
-  border: 1px solid #333;
+  border: 1px solid var(--red);
+  background: rgba(200, 16, 46, 0.12);
 
-  color: #999;
+  color: var(--white);
 
   font-size: 9px;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 1.5px;
 }
 
 .results-sort {
   display: flex;
   align-items: center;
-  gap: 9px;
+  gap: 10px;
 
-  color: #666;
+  color: var(--gray);
 
-  font-size: 10px;
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
 }
 
 .results-sort select {
-  min-width: 145px;
+  min-width: 160px;
 
-  padding: 8px 10px;
+  padding: 9px 12px;
 
-  border: 1px solid #303030;
-  border-radius: 2px;
+  border: 1px solid rgba(245, 242, 237, 0.2);
 
   outline: 0;
 
-  background: #111;
-  color: #bbb;
+  background: #121212;
+  color: var(--white);
 
   font-size: 11px;
+  font-weight: 500;
 }
 
 .results-sort select:focus {
-  border-color: #555;
+  border-color: var(--red);
 }
 
 /* =========================================================
@@ -519,18 +551,30 @@ a {
 
 .lut-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 28px 18px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 32px 24px;
 }
 
 /* =========================================================
-   LUT CARD
+   BOLD & PROMINENT LUT CARD
    ========================================================= */
 
 .lut-card {
   min-width: 0;
 
-  background: transparent;
+  background: #111111;
+  border: 1px solid rgba(245, 242, 237, 0.15);
+
+  transition:
+    transform 300ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    border-color 300ms ease,
+    box-shadow 300ms ease;
+}
+
+.lut-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--red);
+  box-shadow: 0 16px 36px rgba(200, 16, 46, 0.18);
 }
 
 .lut-card-preview {
@@ -542,9 +586,7 @@ a {
 
   overflow: hidden;
 
-  background: #171717;
-
-  border: 1px solid #242424;
+  background: #000;
 }
 
 .lut-card-image {
@@ -552,21 +594,6 @@ a {
   inset: 0;
 
   overflow: hidden;
-
-  transition: transform 400ms cubic-bezier(0.2, 0.7, 0.2, 1);
-}
-
-.lut-card-image img {
-  width: 100%;
-  height: 100%;
-
-  display: block;
-
-  object-fit: cover;
-
-  transition:
-    transform 500ms cubic-bezier(0.2, 0.7, 0.2, 1),
-    opacity 300ms ease;
 }
 
 .lut-card-media {
@@ -577,89 +604,66 @@ a {
 
   object-fit: cover;
 
-  transition:
-    transform 500ms cubic-bezier(0.2, 0.7, 0.2, 1),
-    opacity 300ms ease;
+  transition: transform 500ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .lut-card:hover .lut-card-media {
-  transform: scale(1.035);
-}
-
-.lut-card-image video {
-  background: #111;
-}
-
-.lut-card:hover .lut-card-image {
-  transform: scale(1.025);
-}
-
-.lut-card:hover .lut-card-image img {
-  transform: scale(1.035);
+  transform: scale(1.06);
 }
 
 .lut-card-overlay {
   position: absolute;
   inset: 0;
 
-  background:
-    linear-gradient(
-      180deg,
-      rgba(0, 0, 0, 0.08),
-      transparent 42%,
-      rgba(0, 0, 0, 0.58)
-    );
-
-  opacity: 0.8;
-
-  transition: opacity 250ms ease;
-}
-
-.lut-card:hover .lut-card-overlay {
-  opacity: 1;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.15) 0%,
+    transparent 50%,
+    rgba(10, 10, 10, 0.85) 100%
+  );
 }
 
 .lut-card-badge {
   position: absolute;
-  top: 10px;
-  left: 10px;
+  top: 12px;
+  left: 12px;
 
-  padding: 5px 7px;
+  padding: 5px 10px;
 
-  background: rgba(0, 0, 0, 0.62);
+  background: var(--red);
 
-  border: 1px solid rgba(255, 255, 255, 0.18);
-
-  color: #eee;
+  color: #ffffff;
 
   font-family: 'DM Mono', monospace;
-  font-size: 8px;
-  letter-spacing: 0.08em;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
 }
 
 .lut-card-view {
   position: absolute;
   left: 50%;
-  bottom: 18px;
+  bottom: 20px;
 
-  transform: translate(-50%, 8px);
+  transform: translate(-50%, 10px);
 
-  padding: 9px 14px;
+  padding: 10px 18px;
 
-  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: var(--white);
+  color: var(--black);
 
-  background: rgba(0, 0, 0, 0.62);
-
-  color: white;
-
-  font-size: 10px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
   white-space: nowrap;
 
   opacity: 0;
 
   transition:
-    opacity 200ms ease,
-    transform 200ms ease;
+    opacity 250ms ease,
+    transform 250ms ease;
 }
 
 .lut-card:hover .lut-card-view {
@@ -672,7 +676,9 @@ a {
    ========================================================= */
 
 .lut-card-content {
-  padding-top: 11px;
+  padding: 18px;
+
+  border-top: 1px solid rgba(245, 242, 237, 0.1);
 }
 
 .lut-card-title-row {
@@ -681,7 +687,7 @@ a {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: 12px;
 }
 
 .lut-card-title {
@@ -689,195 +695,63 @@ a {
 
   overflow: hidden;
 
-  color: #eee;
+  color: var(--white);
 
-  font-size: 12px;
-  font-weight: 500;
+  font-family: var(--font-serif);
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.25;
 
   text-overflow: ellipsis;
   white-space: nowrap;
 
-  transition: color 160ms ease;
+  transition: color 180ms ease;
 }
 
-.lut-card-title:hover {
-  color: #fff;
+.lut-card:hover .lut-card-title {
+  color: #ffffff;
 }
 
 .lut-card-meta {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 
-  margin-top: 6px;
+  margin-top: 8px;
 
-  color: #656565;
+  color: var(--gray);
 
-  font-size: 10px;
+  font-size: 11px;
+  font-weight: 500;
 }
 
 .lut-card-bottom {
-  margin-top: 10px;
+  margin-top: 16px;
+  padding-top: 12px;
+
+  border-top: 1px dashed rgba(245, 242, 237, 0.12);
 
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: 12px;
 }
 
 .lut-card-downloads {
-  color: #555;
+  color: var(--gray);
 
-  font-size: 9px;
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
 .lut-card-price {
-  color: #bbb;
+  color: var(--white);
 
   font-family: 'DM Mono', monospace;
-  font-size: 9px;
-}
-
-/* =========================================================
-   FAVORITE BUTTON
-   ========================================================= */
-
-.lut-card-title-row button {
-  flex: 0 0 auto;
-}
-
-/* =========================================================
-   LOADING
-   ========================================================= */
-
-.lut-card-skeleton {
-  pointer-events: none;
-}
-
-.lut-card-skeleton .lut-card-image {
-  position: relative;
-
-  background:
-    linear-gradient(
-      90deg,
-      #151515 0%,
-      #202020 50%,
-      #151515 100%
-    );
-
-  background-size: 200% 100%;
-
-  animation: skeleton 1.4s ease infinite;
-}
-
-.lut-card-skeleton .lut-card-content > div {
-  height: 10px;
-
-  margin-bottom: 8px;
-
-  background: #191919;
-}
-
-.lut-card-skeleton .lut-card-content > div:first-child {
-  width: 65%;
-}
-
-.lut-card-skeleton .lut-card-content > div:last-child {
-  width: 42%;
-}
-
-@keyframes skeleton {
-  from {
-    background-position: 200% 0;
-  }
-
-  to {
-    background-position: -200% 0;
-  }
-}
-
-/* =========================================================
-   EMPTY / ERROR
-   ========================================================= */
-
-.lut-empty {
-  min-height: 420px;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-
-  border: 1px solid #202020;
-
-  text-align: center;
-}
-
-.lut-empty-symbol {
-  margin-bottom: 18px;
-
-  color: #555;
-
-  font-size: 28px;
-}
-
-.lut-empty h3 {
-  margin: 0;
-
-  font-family: 'Playfair Display', serif;
-  font-size: 28px;
-  font-weight: 500;
-}
-
-.lut-empty p {
-  margin: 10px 0 20px;
-
-  color: #666;
-
-  font-size: 12px;
-}
-
-.lut-empty button {
-  padding: 9px 15px;
-
-  border: 1px solid #333;
-
-  background: #151515;
-  color: #ccc;
-
   font-size: 11px;
-}
-
-.lut-empty button:hover {
-  background: #202020;
-  color: white;
-}
-
-.lut-error {
-  min-height: 250px;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-
-  border: 1px solid #302020;
-
-  color: #777;
-
-  text-align: center;
-}
-
-.lut-error strong {
-  margin-bottom: 8px;
-
-  color: #ddd;
-
-  font-size: 13px;
-}
-
-.lut-error span {
-  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
 }
 
 /* =========================================================
@@ -889,34 +763,27 @@ a {
 
   margin: 0 auto;
 
-  padding: 40px 0;
+  padding: 48px 0;
 
-  border-top: 1px solid #202020;
+  border-top: 1px solid rgba(245, 242, 237, 0.12);
 
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
 
-  color: #555;
+  color: var(--gray);
 
-  font-size: 10px;
-}
-
-.marketplace-footer div {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  font-size: 11px;
 }
 
 .marketplace-footer strong {
-  color: #aaa;
+  color: var(--white);
 
-  font-size: 11px;
-  letter-spacing: 0.16em;
-}
-
-.marketplace-footer span {
-  color: #555;
+  font-family: var(--font-serif);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
 }
 
 /* =========================================================
@@ -925,39 +792,13 @@ a {
 
 @media (max-width: 1150px) {
   .lut-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 @media (max-width: 850px) {
-  .marketplace-header {
-    height: 64px;
-  }
-
-  .marketplace-header-inner,
-  .marketplace-main,
-  .marketplace-footer {
-    width: calc(100% - 32px);
-  }
-
-  .marketplace-nav {
-    display: none;
-  }
-
-  .marketplace-brand {
-    min-width: auto;
-  }
-
-  .marketplace-account {
-    min-width: auto;
-  }
-
-  .marketplace-heading {
-    padding: 48px 0 32px;
-  }
-
   .marketplace-heading h1 {
-    font-size: 48px;
+    font-size: 46px;
   }
 
   .lut-marketplace-layout {
@@ -970,15 +811,11 @@ a {
 
   .lut-filter-sidebar {
     display: none;
-
     position: static;
-
-    margin-bottom: 25px;
-    padding: 22px;
-
-    border: 1px solid #242424;
-
-    background: #101010;
+    margin-bottom: 28px;
+    padding: 24px;
+    background: #121212;
+    border: 1px solid rgba(245, 242, 237, 0.15);
   }
 
   .lut-filter-sidebar-open {
@@ -987,44 +824,13 @@ a {
 
   .lut-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 25px 14px;
-  }
-
-  .results-sort {
-    display: none;
+    gap: 24px 16px;
   }
 }
 
-@media (max-width: 560px) {
-  .marketplace-heading h1 {
-    font-size: 39px;
-  }
-
-  .marketplace-heading p {
-    font-size: 13px;
-  }
-
-  .lut-toolbar {
-    display: grid;
-    grid-template-columns: 1fr auto;
-  }
-
-  .lut-search {
-    min-width: 0;
-  }
-
+@media (max-width: 580px) {
   .lut-grid {
     grid-template-columns: 1fr;
-    gap: 30px;
-  }
-
-  .lut-card-preview {
-    aspect-ratio: 16 / 9;
-  }
-
-  .marketplace-footer {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 25px;
+    gap: 28px;
   }
 }
