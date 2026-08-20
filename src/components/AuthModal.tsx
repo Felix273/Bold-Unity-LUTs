@@ -13,11 +13,12 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
       <div className="relative w-full max-w-sm">
         <button
           onClick={onClose}
-          className="absolute -top-3 -right-3 text-neutral-400 hover:text-white bg-neutral-900 border border-neutral-700 text-xl font-bold w-8 h-8 flex items-center justify-center rounded-full transition-colors z-10"
+          aria-label="Close sign in dialog"
+          className="absolute -top-3 -right-3 text-[#8a8580] hover:text-white bg-[#111] border border-[#333] text-xl font-bold w-8 h-8 flex items-center justify-center transition-colors z-10"
         >
           ×
         </button>
-        <AuthForm />
+        <AuthForm onSuccess={onClose} />
       </div>
     </div>
   )

@@ -1,4 +1,4 @@
-import supabase from './supabase'
+import supabase, { isSupabaseConfigured } from './supabase'
 
 export type Category = {
   id: string
@@ -7,6 +7,8 @@ export type Category = {
 }
 
 export async function fetchCategories(): Promise<Category[]> {
+  if (!isSupabaseConfigured) return []
+
   const { data, error } = await supabase
     .from('categories')
     .select('id, name, slug')

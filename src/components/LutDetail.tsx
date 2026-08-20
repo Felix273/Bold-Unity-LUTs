@@ -1,12 +1,24 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { fetchLutById, fetchLuts, downloadFreeLut, type Lut } from '../lib/luts'
+import { createEntitledLutDownloadUrl, createLutDownloadUrl, fetchLutById, fetchLuts, downloadFreeLut, type Lut } from '../lib/luts'
 import { fetchFavoriteIds } from '../lib/favorites'
 import { useAuth } from '../contexts/AuthContext'
 import FavoriteButton from './FavoriteButton'
 import BeforeAfterSlider from './BeforeAfterSlider'
+import ReviewPanel from './ReviewPanel'
+import { averageReviewRating, fetchApprovedReviews, type Review } from '../lib/reviews'
+import {
+  isPaymentDemo,
+  recordDemoDownload,
+  recordDemoPurchase,
+  startPayment,
+} from '../lib/payments'
 
-export default function LutDetail() {
+type LutDetailProps = {
+  onOpenAuth: () => void
+}
+
+export default function LutDetail({ onOpenAuth }: LutDetailProps) {
   const { id } = useParams<{ id: string }>()
   const { user } = useAuth()
   const [lut, setLut] = useState<Lut | null>(null)
@@ -18,7 +30,9 @@ export default function LutDetail() {
 
   const [downloading, setDownloading] = useState(false)
   const [downloadError, setDownloadError] = useState<string | null>(null)
+  const [paymentReference, setPaymentReference] = useState<string | null>(null)
   const [downloaded, setDownloaded] = useState(false)
+  const [approvedReviews, setApprovedReviews] = useState<Review[]>([])
 
   useEffect(() => {
     if (!id) return
@@ -78,21 +92,83 @@ export default function LutDetail() {
     }
   }, [user, id])
 
+  useEffect(() => {
+    if (!id) return
+    let mounted = true
+
+    fetchApprovedReviews(id)
+      .then((items) => {
+        if (mounted) setApprovedReviews(items)
+      })
+      .catch(() => {
+        if (mounted) setApprovedReviews([])
+      })
+
+    return () => {
+      mounted = false
+    }
+  }, [id])
+
   const handleDownload = async () => {
     if (!lut) return
     setDownloadError(null)
+    setPaymentReference(null)
+
+    if (!user) {
+      setDownloadError('Sign in to Download')
+      return
+    }
+
     setDownloading(true)
     try {
-      await downloadFreeLut(lut.id)
+      if (!lut.file_url) {
+        throw new Error('This LUT does not have a downloadable asset yet.')
+      }
+
+      if (lut.price > 0) {
+        const result = await startPayment({
+          type: 'lut',
+          lutId: lut.id,
+          title: lut.title,
+          amount: lut.price,
+          currency: 'KES',
+        })
+
+        if (!isPaymentDemo && result.authorizationUrl) {
+          window.location.assign(result.authorizationUrl)
+          return
+        }
+
+        if (isPaymentDemo) {
+          if (/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(lut.id)) {
+            await recordDemoPurchase(
+              lut.id,
+              lut.title,
+              lut.price,
+              'KES',
+              result.reference,
+            )
+            await recordDemoDownload(lut.id, lut.title)
+          }
+          setPaymentReference(result.reference)
+        }
+      } else {
+        if (import.meta.env.VITE_USE_EDGE_DOWNLOADS !== 'true') {
+          await downloadFreeLut(lut.id)
+        }
+      }
+
       setDownloaded(true)
       setLut({ ...lut, downloads: lut.downloads + 1 })
 
-      // Trigger actual sample .cube file download simulation
+      const downloadUrl = import.meta.env.VITE_USE_EDGE_DOWNLOADS === 'true'
+        ? await createEntitledLutDownloadUrl(lut.id)
+        : await createLutDownloadUrl(lut.file_url)
       const element = document.createElement('a')
-      const fileContent = `# Bold Unity Cinematic LUT\n# Title: ${lut.title}\nLUT_3D_SIZE 33\n0.0 0.0 0.0\n1.0 1.0 1.0\n`
-      const blob = new Blob([fileContent], { type: 'text/plain' })
-      element.href = URL.createObjectURL(blob)
-      element.download = `${lut.title.toLowerCase().replace(/\s+/g, '_')}_lut.cube`
+      element.href = downloadUrl
+      element.download = lut.file_url.split('/').pop() || `${lut.title}.cube`
+      element.target = '_blank'
+      element.rel = 'noreferrer'
       document.body.appendChild(element)
       element.click()
       document.body.removeChild(element)
@@ -241,8 +317,8 @@ export default function LutDetail() {
 
           <div className="flex items-center gap-6 py-3 border-y border-[#222] text-sm text-[#8a8580]">
             <div>
-              <span className="text-[#f5f2ed] font-bold">★ {lut.rating?.toFixed(1) ?? '4.9'}</span>
-              <span className="text-[10px] uppercase tracking-wider text-[#8a8580] block">Rating</span>
+              <span className="text-[#f5f2ed] font-bold">★ {averageReviewRating(approvedReviews, lut.rating).toFixed(1)}</span>
+              <span className="text-[10px] uppercase tracking-wider text-[#8a8580] block">Rating · {approvedReviews.length} review{approvedReviews.length === 1 ? '' : 's'}</span>
             </div>
             <div className="h-8 w-px bg-[#222]" />
             <div>
@@ -287,16 +363,22 @@ export default function LutDetail() {
               !user ? (
                 <div className="space-y-2">
                   <p className="text-xs text-[#8a8580] text-center">Sign in to claim your free LUT download</p>
-                  <Link
-                    to="/"
+                  <button
+                    type="button"
+                    onClick={onOpenAuth}
                     className="block w-full text-center bg-[#f5f2ed] hover:bg-white text-black font-bold uppercase tracking-widest py-3.5 text-xs transition-colors"
                   >
                     Sign In to Download
-                  </Link>
+                  </button>
                 </div>
               ) : downloaded ? (
-                <div className="bg-[#182218] border border-emerald-800 text-emerald-400 p-3 text-center text-xs font-mono uppercase tracking-widest font-bold">
-                  ✓ File Downloaded (.CUBE file saved)
+                <div className="bg-[#182218] border border-emerald-800 text-emerald-400 p-3 text-center text-xs font-mono uppercase tracking-widest font-bold space-y-1">
+                  <div>✓ Demo File Downloaded (.CUBE file saved)</div>
+                  {paymentReference && (
+                    <div className="text-[10px] normal-case tracking-normal text-emerald-500">
+                      Demo reference: {paymentReference}
+                    </div>
+                  )}
                 </div>
               ) : (
                 <button
@@ -355,6 +437,8 @@ export default function LutDetail() {
           </div>
         </div>
       )}
+
+      <ReviewPanel lutId={lut.id} />
     </div>
   )
 }

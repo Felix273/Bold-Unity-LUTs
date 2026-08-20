@@ -7,6 +7,7 @@ import {
 } from 'react'
 import type { Session, User } from '@supabase/supabase-js'
 import supabase from '../lib/supabase'
+import { isSupabaseConfigured } from '../lib/supabase'
 
 type Profile = {
   user_id: string
@@ -16,6 +17,7 @@ type Profile = {
   billing_cycle: string
   downloads_used: number
   downloads_limit: number
+  is_admin: boolean
 }
 
 type AuthCtx = {
@@ -89,6 +91,11 @@ export function AuthProvider({
     let mounted = true
 
     const initializeAuth = async () => {
+      if (!isSupabaseConfigured) {
+        if (mounted) setLoading(false)
+        return
+      }
+
       const {
         data: { session },
       } = await supabase.auth.getSession()
@@ -138,6 +145,12 @@ export function AuthProvider({
     email: string,
     password: string
   ) => {
+    if (!isSupabaseConfigured) {
+      return {
+        error: 'Supabase is not configured. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to .env.local.',
+      }
+    }
+
     const { error } = await supabase.auth.signUp({
       email,
       password,
@@ -152,6 +165,12 @@ export function AuthProvider({
     email: string,
     password: string
   ) => {
+    if (!isSupabaseConfigured) {
+      return {
+        error: 'Supabase is not configured. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to .env.local.',
+      }
+    }
+
     const { error } =
       await supabase.auth.signInWithPassword({
         email,
@@ -164,6 +183,8 @@ export function AuthProvider({
   }
 
   const signOut = async () => {
+    if (!isSupabaseConfigured) return
+
     await supabase.auth.signOut()
   }
 

@@ -1,6 +1,11 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
-import supabase from '../lib/supabase'
+import {
+  isPaymentDemo,
+  recordDemoSubscription,
+  startPayment,
+} from '../lib/payments'
+import { fetchSubscriptionPlans, type SubscriptionPlan } from '../lib/plans'
 
 interface PricingModalProps {
   isOpen: boolean
@@ -12,6 +17,22 @@ export default function PricingModal({ isOpen, onClose }: PricingModalProps) {
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('annual')
   const [upgrading, setUpgrading] = useState(false)
   const [successMsg, setSuccessMsg] = useState<string | null>(null)
+  const [plans, setPlans] = useState<SubscriptionPlan[]>([])
+
+  useEffect(() => {
+    if (!isOpen) return
+    fetchSubscriptionPlans().then(setPlans).catch(() => setPlans([]))
+  }, [isOpen])
+
+  const planPrice = (name: string, cycle: 'monthly' | 'annual') => {
+    const plan = plans.find((item) => item.name.toLowerCase() === name.toLowerCase())
+    if (plan) return Number(cycle === 'annual' ? plan.price_yearly : plan.price_monthly)
+    const fallback: Record<string, { monthly: number; annual: number }> = {
+      Pro: { monthly: 18, annual: 144 },
+      Studio: { monthly: 49, annual: 420 },
+    }
+    return fallback[name]?.[cycle] ?? 0
+  }
 
   if (!isOpen) return null
 
@@ -25,30 +46,43 @@ export default function PricingModal({ isOpen, onClose }: PricingModalProps) {
     setSuccessMsg(null)
 
     try {
-      const { error } = await supabase
-        .from('user_profiles')
-        .upsert({
-          user_id: user.id,
-          email: user.email,
-          plan: planName,
-          status: 'active',
-          billing_cycle: billingCycle,
-          downloads_used: profile?.downloads_used ?? 0,
-          downloads_limit: planName === 'Free' ? 10 : 99999,
-        })
-
-      if (error) {
-        console.error('Failed to update plan profile:', error)
-      } else {
-        await refreshProfile()
-        setSuccessMsg(`Successfully subscribed to ${planName} Plan!`)
-        setTimeout(() => {
-          setSuccessMsg(null)
-          onClose()
-        }, 1500)
+      if (planName === 'Free') {
+        setSuccessMsg('Free plan is already available without checkout.')
+        return
       }
+
+      const result = await startPayment({
+        type: 'subscription',
+        plan: planName as 'Pro' | 'Studio',
+        billingCycle,
+      })
+
+      if (!isPaymentDemo && result.authorizationUrl) {
+        window.location.assign(result.authorizationUrl)
+        return
+      }
+
+      if (isPaymentDemo) {
+        await recordDemoSubscription(
+          planName as 'Pro' | 'Studio',
+          billingCycle,
+          result.reference,
+        )
+      }
+
+      await refreshProfile()
+      setSuccessMsg(
+        isPaymentDemo
+          ? `Demo checkout complete. Reference: ${result.reference}`
+          : `Successfully subscribed to ${planName} Plan!`,
+      )
+      setTimeout(() => {
+        setSuccessMsg(null)
+        onClose()
+      }, 1800)
     } catch (err) {
       console.error('Plan upgrade error:', err)
+      setSuccessMsg(err instanceof Error ? err.message : 'Checkout failed.')
     } finally {
       setUpgrading(false)
     }
@@ -71,7 +105,7 @@ export default function PricingModal({ isOpen, onClose }: PricingModalProps) {
           </span>
           <h2 className="text-3xl font-serif font-bold text-[#f5f2ed]">Choose Your Creator Pass</h2>
           <p className="text-xs text-[#8a8580]">
-            Unlock instant access to hundreds of 3D LUT presets for Premiere Pro, DaVinci Resolve, Final Cut Pro, and Lightroom.
+            Unlock instant access to the full LUT library for Premiere Pro, DaVinci Resolve, Final Cut Pro, and Lightroom.
           </p>
         </div>
 
@@ -91,7 +125,7 @@ export default function PricingModal({ isOpen, onClose }: PricingModalProps) {
             />
           </button>
           <span className={`text-xs uppercase tracking-wider ${billingCycle === 'annual' ? 'text-[#f5f2ed] font-bold' : 'text-[#8a8580]'}`}>
-            Annual Billing <span className="text-[#c8102e] font-mono text-[10px] ml-1">(Save 30%)</span>
+            Annual Billing <span className="text-[#c8102e] font-mono text-[10px] ml-1">(one yearly charge)</span>
           </span>
         </div>
 
@@ -136,9 +170,9 @@ export default function PricingModal({ isOpen, onClose }: PricingModalProps) {
               <span className="text-xs font-mono text-[#c8102e] uppercase tracking-widest font-bold">Creator Pro</span>
               <div className="flex items-baseline gap-1">
                 <span className="text-3xl font-bold text-[#f5f2ed]">
-                  {billingCycle === 'annual' ? '$12' : '$18'}
+                  KES {planPrice('Pro', billingCycle).toLocaleString()}
                 </span>
-                <span className="text-xs text-[#8a8580]">/ month</span>
+                <span className="text-xs text-[#8a8580]">{billingCycle === 'annual' ? '/ year' : '/ month'}</span>
               </div>
               <p className="text-xs text-[#8a8580]">Full access for video editors & filmmakers.</p>
               <ul className="text-xs text-[#f5f2ed] space-y-2 pt-2">
@@ -163,9 +197,9 @@ export default function PricingModal({ isOpen, onClose }: PricingModalProps) {
               <span className="text-xs font-mono text-[#8a8580] uppercase tracking-widest">Studio Team</span>
               <div className="flex items-baseline gap-1">
                 <span className="text-3xl font-bold text-[#f5f2ed]">
-                  {billingCycle === 'annual' ? '$35' : '$49'}
+                  KES {planPrice('Studio', billingCycle).toLocaleString()}
                 </span>
-                <span className="text-xs text-[#8a8580]">/ month</span>
+                <span className="text-xs text-[#8a8580]">{billingCycle === 'annual' ? '/ year' : '/ month'}</span>
               </div>
               <p className="text-xs text-[#8a8580]">Designed for production teams & agencies.</p>
               <ul className="text-xs text-[#e8e4dd] space-y-2 pt-2">

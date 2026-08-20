@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { fetchFavoriteIds } from '../lib/favorites'
 import { fetchLutById, type Lut } from '../lib/luts'
 import FavoriteButton from './FavoriteButton'
+import { cancelSubscription, fetchUserDownloads, fetchUserPurchases, type UserDownload, type UserPurchase } from '../lib/account'
 
 interface UserAccountProps {
   onOpenPricing?: () => void
@@ -14,6 +15,11 @@ export default function UserAccount({ onOpenPricing }: UserAccountProps) {
   const [activeTab, setActiveTab] = useState<'favorites' | 'downloads' | 'settings'>('favorites')
   const [favoriteLuts, setFavoriteLuts] = useState<Lut[]>([])
   const [loadingFavorites, setLoadingFavorites] = useState(true)
+  const [purchases, setPurchases] = useState<UserPurchase[]>([])
+  const [downloads, setDownloads] = useState<UserDownload[]>([])
+  const [loadingHistory, setLoadingHistory] = useState(true)
+  const [historyError, setHistoryError] = useState<string | null>(null)
+  const [cancelling, setCancelling] = useState(false)
 
   useEffect(() => {
     if (!user) return
@@ -39,18 +45,65 @@ export default function UserAccount({ onOpenPricing }: UserAccountProps) {
     loadFavorites()
   }, [user])
 
+  const handleCancelSubscription = async () => {
+    if (!window.confirm('Cancel your current subscription?')) return
+    setCancelling(true)
+    try {
+      await cancelSubscription()
+      window.location.reload()
+    } catch (error) {
+      window.alert(error instanceof Error ? error.message : 'Unable to cancel subscription.')
+    } finally {
+      setCancelling(false)
+    }
+  }
+
+  useEffect(() => {
+    if (!user) return
+
+    let mounted = true
+    const userId = user.id
+
+    async function loadHistory() {
+      setLoadingHistory(true)
+      setHistoryError(null)
+
+      try {
+        const [purchaseRows, downloadRows] = await Promise.all([
+          fetchUserPurchases(userId),
+          fetchUserDownloads(userId),
+        ])
+
+        if (mounted) {
+          setPurchases(purchaseRows)
+          setDownloads(downloadRows)
+        }
+      } catch {
+        if (mounted) setHistoryError('Unable to load your order history.')
+      } finally {
+        if (mounted) setLoadingHistory(false)
+      }
+    }
+
+    loadHistory()
+
+    return () => {
+      mounted = false
+    }
+  }, [user])
+
   if (authLoading) {
-    return <p className="text-center py-20 text-neutral-400">Loading profile...</p>
+    return <p className="text-center py-20 text-[#8a8580] uppercase tracking-widest text-xs">Loading profile...</p>
   }
 
   if (!user) {
     return (
       <div className="max-w-md mx-auto py-20 text-center space-y-4">
-        <h2 className="text-2xl font-serif text-white">Account Access Required</h2>
-        <p className="text-sm text-neutral-400">Please sign in to view your account, saved favorites, and downloads.</p>
+        <h2 className="text-2xl font-serif text-[#f5f2ed]">Account Access Required</h2>
+        <p className="text-sm text-[#8a8580]">Please sign in to view your account, saved favorites, and downloads.</p>
         <Link
           to="/"
-          className="inline-block bg-amber-500 hover:bg-amber-400 text-black font-medium px-6 py-2.5 rounded-xl text-sm transition-colors"
+          className="inline-block bg-[#f5f2ed] hover:bg-white text-black font-semibold px-6 py-2.5 text-xs uppercase tracking-widest transition-colors"
         >
           Return to Catalog
         </Link>
@@ -195,17 +248,48 @@ export default function UserAccount({ onOpenPricing }: UserAccountProps) {
       {/* TAB CONTENT: DOWNLOADS */}
       {activeTab === 'downloads' && (
         <div className="bg-neutral-900 border border-neutral-800 rounded-2xl p-6 text-sm text-neutral-300 space-y-4">
-          <h3 className="font-serif text-lg text-white">Your Asset Download History</h3>
+          <div>
+            <h3 className="font-serif text-lg text-white">Your Asset Download History</h3>
+            <p className="text-xs text-neutral-400 mt-1">
+              {purchases.length} purchase{purchases.length === 1 ? '' : 's'} · {downloads.length} download{downloads.length === 1 ? '' : 's'}
+            </p>
+          </div>
           <p className="text-xs text-neutral-400">
             All free sample downloads and purchased .CUBE LUT packages associated with {user.email}.
           </p>
-          <div className="border border-neutral-800 rounded-xl p-4 bg-neutral-950 text-xs flex items-center justify-between">
-            <div>
-              <p className="font-semibold text-white">Free Cinematic LUT Collection</p>
-              <p className="text-neutral-500 font-mono text-[10px] mt-0.5">Format: .CUBE (Universal 3D LUT)</p>
+          {loadingHistory ? (
+            <p className="text-neutral-400 text-xs py-8 text-center">Loading your history...</p>
+          ) : historyError ? (
+            <p className="text-red-400 text-xs py-8 text-center">{historyError}</p>
+          ) : purchases.length === 0 && downloads.length === 0 ? (
+            <p className="text-neutral-400 text-xs py-8 text-center">No purchases or downloads yet.</p>
+          ) : (
+            <div className="space-y-3">
+              {purchases.map((purchase) => (
+                <div key={purchase.id} className="border border-neutral-800 rounded-xl p-4 bg-neutral-950 text-xs flex items-center justify-between gap-4">
+                  <div className="min-w-0">
+                    <p className="font-semibold text-white truncate">{purchase.title || 'LUT purchase'}</p>
+                    <p className="text-neutral-500 font-mono text-[10px] mt-1">
+                      {purchase.payment_reference || 'Payment reference unavailable'} · {new Date(purchase.created_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <span className="text-emerald-400 font-mono shrink-0">
+                    {purchase.currency} {purchase.amount.toLocaleString()}
+                  </span>
+                </div>
+              ))}
+
+              {downloads.map((download) => (
+                <Link key={download.id} to={`/lut/${download.lut_id}`} className="border border-neutral-800 rounded-xl p-4 bg-neutral-950 text-xs flex items-center justify-between gap-4 hover:border-amber-500 transition-colors">
+                  <div className="min-w-0">
+                    <p className="font-semibold text-white truncate">{download.title || 'LUT download'}</p>
+                    <p className="text-neutral-500 font-mono text-[10px] mt-1">Downloaded · {new Date(download.created_at).toLocaleDateString()}</p>
+                  </div>
+                  <span className="text-amber-400 shrink-0">View LUT →</span>
+                </Link>
+              ))}
             </div>
-            <span className="text-emerald-400 font-mono">Active License</span>
-          </div>
+          )}
         </div>
       )}
 
@@ -227,6 +311,11 @@ export default function UserAccount({ onOpenPricing }: UserAccountProps) {
               <p className="text-lg font-bold text-emerald-400">Licensed for YouTube & Commercial</p>
             </div>
           </div>
+          {profile?.status === 'active' && profile.plan !== 'free' && (
+            <button onClick={handleCancelSubscription} disabled={cancelling} className="border border-[#5b1825] text-[#ff6b7d] px-4 py-2 text-xs uppercase tracking-widest disabled:opacity-50">
+              {cancelling ? 'Cancelling...' : 'Cancel subscription'}
+            </button>
+          )}
         </div>
       )}
     </div>

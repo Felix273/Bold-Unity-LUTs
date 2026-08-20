@@ -1,7 +1,13 @@
 import { createClient } from '@supabase/supabase-js'
 
-const url = (import.meta.env.VITE_SUPABASE_URL as string) || 'https://demo-bold-unity.supabase.co'
-const anonKey = (import.meta.env.VITE_SUPABASE_ANON_KEY as string) || 'demo-anon-key'
+const url = import.meta.env.VITE_SUPABASE_URL as string | undefined
+const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined
 
-export const supabase = createClient(url, anonKey)
+export const isSupabaseConfigured = Boolean(url && anonKey)
+
+// Keep the client constructible for demo mode; callers must check configuration first.
+export const supabase = createClient(
+	url || 'https://placeholder.supabase.co',
+	anonKey || 'placeholder-anon-key',
+)
 export default supabase

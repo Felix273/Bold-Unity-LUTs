@@ -20,7 +20,7 @@ html {
 
 body {
   margin: 0;
-  min-width: 320px;
+  min-width: 0;
   background: var(--black);
   color: var(--white);
   font-family: var(--font-sans);
@@ -126,6 +126,22 @@ a {
   text-transform: uppercase;
 }
 
+.mobile-menu-toggle {
+  display: none;
+  width: 40px;
+  height: 36px;
+  padding: 8px;
+  border: 1px solid #333;
+  background: transparent;
+}
+
+.mobile-menu-toggle span {
+  display: block;
+  height: 1px;
+  margin: 4px 0;
+  background: var(--white);
+}
+
 .marketplace-nav a,
 .marketplace-nav button {
   transition: color 180ms ease;
@@ -190,6 +206,27 @@ a {
   font-weight: 600;
   letter-spacing: 1.5px;
   text-transform: uppercase;
+}
+
+.theme-toggle {
+  padding: 8px 10px;
+  border: 1px solid rgba(245, 242, 237, 0.2);
+  background: transparent;
+  color: var(--gray);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.theme-toggle:hover {
+  border-color: var(--red);
+  color: var(--white);
+}
+
+/* Theme-aware replacement for legacy dark text utility classes. */
+.text-\[\#f5f2ed\] {
+  color: var(--white) !important;
 }
 
 .marketplace-user button:hover {
@@ -266,11 +303,13 @@ a {
   display: flex;
   gap: 14px;
   margin-bottom: 36px;
+  min-width: 0;
 }
 
 .lut-search {
   position: relative;
   flex: 1;
+  min-width: 0;
 
   height: 52px;
 
@@ -484,6 +523,7 @@ a {
   align-items: flex-start;
   justify-content: space-between;
   gap: 20px;
+  flex-wrap: wrap;
 }
 
 .results-count {
@@ -770,6 +810,8 @@ a {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
 
   color: var(--gray);
 
@@ -797,6 +839,70 @@ a {
 }
 
 @media (max-width: 850px) {
+  .marketplace-header {
+    height: auto;
+    min-height: 76px;
+  }
+
+  .marketplace-header-inner {
+    width: min(100% - 24px, 1440px);
+    min-height: 76px;
+    padding: 12px 0 0;
+    flex-wrap: wrap;
+  }
+
+  .marketplace-brand {
+    min-width: 0;
+  }
+
+  .marketplace-nav {
+    display: none;
+    order: 3;
+    width: 100%;
+    min-width: 0;
+    padding: 12px 0;
+    gap: 24px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .marketplace-nav-open {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: 8px 0 14px;
+    overflow: visible;
+  }
+
+  .marketplace-nav-open a,
+  .marketplace-nav-open button {
+    padding: 12px 0;
+    text-align: left;
+  }
+
+  .mobile-menu-toggle {
+    display: block;
+    order: 2;
+  }
+
+  .marketplace-account {
+    margin-left: auto;
+    margin-right: 8px;
+  }
+
+  .marketplace-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .marketplace-account {
+    min-width: 0;
+  }
+
+  .marketplace-user {
+    gap: 8px;
+  }
+
   .marketplace-heading h1 {
     font-size: 46px;
   }
@@ -829,8 +935,135 @@ a {
 }
 
 @media (max-width: 580px) {
+  .marketplace-header-inner,
+  .marketplace-main,
+  .marketplace-footer {
+    width: calc(100% - 24px);
+  }
+
+  .marketplace-brand-name {
+    font-size: 12px;
+    letter-spacing: 0.14em;
+  }
+
+  .marketplace-signin {
+    padding: 9px 12px;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+  }
+
+  .marketplace-user button {
+    padding: 7px 8px;
+    font-size: 9px;
+    letter-spacing: 1px;
+  }
+
+  .theme-toggle {
+    padding: 7px 8px;
+    font-size: 9px;
+  }
+
+  .marketplace-heading {
+    padding: 48px 0 36px;
+  }
+
+  .marketplace-heading h1 {
+    font-size: 40px;
+  }
+
+  .marketplace-heading p {
+    font-size: 14px;
+  }
+
+  .results-sort {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .results-sort select {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .mobile-filter-button {
+    flex-shrink: 0;
+    padding: 0 12px;
+  }
+
+  .marketplace-footer {
+    align-items: flex-start;
+    padding: 36px 0;
+  }
+
   .lut-grid {
     grid-template-columns: 1fr;
     gap: 28px;
   }
+}
+
+:root[data-theme='light'] .app,
+:root[data-theme='light'] .marketplace-header,
+:root[data-theme='light'] .lut-card,
+:root[data-theme='light'] .lut-search,
+:root[data-theme='light'] .results-sort select,
+:root[data-theme='light'] .lut-filter-sidebar,
+:root[data-theme='light'] .mobile-filter-button,
+:root[data-theme='light'] .theme-toggle,
+:root[data-theme='light'] .marketplace-user button {
+  background-color: var(--surface);
+  color: var(--white);
+  border-color: var(--line);
+}
+
+:root[data-theme='light'] .bg-\[\#111\],
+:root[data-theme='light'] .bg-\[\#0a0a0a\],
+:root[data-theme='light'] .bg-\[\#181818\] {
+  background-color: var(--surface) !important;
+}
+
+:root[data-theme='light'] .text-\[\#e8e4dd\] {
+  color: var(--light-gray) !important;
+}
+
+:root[data-theme='light'] .text-\[\#555\] {
+  color: var(--gray) !important;
+}
+
+:root[data-theme='light'] .border-\[\#222\],
+:root[data-theme='light'] .border-\[\#333\],
+:root[data-theme='light'] .border-neutral-800 {
+  border-color: var(--line) !important;
+}
+
+:root[data-theme='light'] .marketplace-header {
+  background: rgba(245, 242, 237, 0.94);
+}
+
+:root[data-theme='light'] .lut-card-content,
+:root[data-theme='light'] .lut-card-bottom,
+:root[data-theme='light'] .marketplace-heading,
+:root[data-theme='light'] .marketplace-footer {
+  border-color: var(--line);
+}
+
+:root[data-theme='light'] .lut-search input,
+:root[data-theme='light'] .results-sort select,
+:root[data-theme='light'] .marketplace-nav,
+:root[data-theme='light'] .marketplace-user,
+:root[data-theme='light'] .lut-card-meta,
+:root[data-theme='light'] .lut-card-downloads,
+:root[data-theme='light'] .filter-option,
+:root[data-theme='light'] .results-sort,
+:root[data-theme='light'] .marketplace-heading p,
+:root[data-theme='light'] .marketplace-footer {
+  color: var(--gray);
+}
+
+:root[data-theme='light'] .filter-option-active,
+:root[data-theme='light'] .marketplace-nav-active,
+:root[data-theme='light'] .lut-card-title,
+:root[data-theme='light'] .lut-card-price,
+:root[data-theme='light'] .marketplace-heading h1,
+:root[data-theme='light'] .marketplace-footer strong {
+  color: var(--white) !important;
 }

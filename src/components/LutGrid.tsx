@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { fetchLuts, type Lut, type LutFilters } from '../lib/luts'
 import { fetchCategories, type Category } from '../lib/categories'
 import { fetchFavoriteIds } from '../lib/favorites'
@@ -16,6 +16,7 @@ type SortKey =
 
 export default function LutGrid() {
   const { user } = useAuth()
+  const [searchParams, setSearchParams] = useSearchParams()
 
   const [luts, setLuts] = useState<Lut[]>([])
   const [categories, setCategories] = useState<Category[]>([])
@@ -24,18 +25,29 @@ export default function LutGrid() {
   )
 
   const [loading, setLoading] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
+  const [page, setPage] = useState(1)
+  const [hasMore, setHasMore] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const [searchInput, setSearchInput] = useState('')
-  const [search, setSearch] = useState('')
+  const [searchInput, setSearchInput] = useState(() => searchParams.get('q') ?? '')
+  const [search, setSearch] = useState(() => searchParams.get('q') ?? '')
 
-  const [categoryId, setCategoryId] = useState('')
-  const [software, setSoftware] = useState('')
+  const [categoryId, setCategoryId] = useState(() => searchParams.get('category') ?? '')
+  const [software, setSoftware] = useState(() => searchParams.get('software') ?? '')
   const [priceType, setPriceType] = useState<
     'all' | 'free' | 'premium'
-  >('all')
+  >(() => {
+    const value = searchParams.get('price')
+    return value === 'free' || value === 'premium' ? value : 'all'
+  })
 
-  const [sort, setSort] = useState<SortKey>('popular')
+  const [sort, setSort] = useState<SortKey>(() => {
+    const value = searchParams.get('sort')
+    return value === 'newest' || value === 'rating' || value === 'price-low' || value === 'price-high'
+      ? value
+      : 'popular'
+  })
 
   const [mobileFiltersOpen, setMobileFiltersOpen] =
     useState(false)
@@ -47,6 +59,17 @@ export default function LutGrid() {
 
     return () => window.clearTimeout(timer)
   }, [searchInput])
+
+  useEffect(() => {
+    const nextParams = new URLSearchParams()
+    if (search) nextParams.set('q', search)
+    if (categoryId) nextParams.set('category', categoryId)
+    if (software) nextParams.set('software', software)
+    if (priceType !== 'all') nextParams.set('price', priceType)
+    if (sort !== 'popular') nextParams.set('sort', sort)
+
+    setSearchParams(nextParams, { replace: true })
+  }, [search, categoryId, software, priceType, sort, setSearchParams])
 
   useEffect(() => {
     fetchCategories()
@@ -100,6 +123,8 @@ export default function LutGrid() {
 
         if (mounted) {
           setLuts(data)
+          setPage(1)
+          setHasMore(data.length === 40)
         }
       } catch (err) {
         if (mounted) {
@@ -122,6 +147,31 @@ export default function LutGrid() {
       mounted = false
     }
   }, [search, categoryId, software, priceType, sort])
+
+  const loadMore = async () => {
+    setLoadingMore(true)
+
+    try {
+      const nextPage = page + 1
+      const data = await fetchLuts({
+        search: search || undefined,
+        categoryId: categoryId || undefined,
+        software: software || undefined,
+        priceType,
+        sort,
+        page: nextPage,
+        pageSize: 40,
+      })
+
+      setLuts((current) => [...current, ...data])
+      setPage(nextPage)
+      setHasMore(data.length === 40)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unable to load more LUTs.')
+    } finally {
+      setLoadingMore(false)
+    }
+  }
 
   const activeCategory = categories.find(
     (category) => category.id === categoryId
@@ -467,8 +517,9 @@ export default function LutGrid() {
           {!loading &&
             !error &&
             luts.length > 0 && (
-              <div className="lut-grid">
-                {luts.map((lut) => (
+              <>
+                <div className="lut-grid">
+                  {luts.map((lut) => (
   <article
     key={lut.id}
     className="lut-card"
@@ -583,8 +634,22 @@ export default function LutGrid() {
       </div>
     </div>
   </article>
-))}
-              </div>
+                  ))}
+                </div>
+
+                {hasMore && (
+                  <div className="flex justify-center mt-10">
+                    <button
+                      type="button"
+                      onClick={loadMore}
+                      disabled={loadingMore}
+                      className="border border-[#333] px-6 py-3 text-xs uppercase tracking-widest text-[#f5f2ed] hover:border-[#c8102e] disabled:opacity-50 transition-colors"
+                    >
+                      {loadingMore ? 'Loading...' : 'Load more LUTs'}
+                    </button>
+                  </div>
+                )}
+              </>
             )}
         </div>
       </div>

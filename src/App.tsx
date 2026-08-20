@@ -1,12 +1,19 @@
-import { useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import './App.css'
 import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from './contexts/AuthContext'
 import LutGrid from './components/LutGrid'
-import LutDetail from './components/LutDetail'
-import UserAccount from './components/UserAccount'
-import PricingModal from './components/PricingModal'
-import AuthModal from './components/AuthModal'
+const LutDetail = lazy(() => import('./components/LutDetail'))
+const UserAccount = lazy(() => import('./components/UserAccount'))
+const PricingModal = lazy(() => import('./components/PricingModal'))
+const AuthModal = lazy(() => import('./components/AuthModal'))
+const AdminLuts = lazy(() => import('./components/AdminLuts'))
+const AdminPlans = lazy(() => import('./components/AdminPlans'))
+const AdminReviews = lazy(() => import('./components/AdminReviews'))
+
+function RouteLoading() {
+  return <p className="text-[#8a8580] text-center py-20 uppercase tracking-widest text-xs">Loading...</p>
+}
 
 function CatalogPage({ onOpenPricing }: { onOpenPricing: () => void }) {
   return (
@@ -42,13 +49,20 @@ function CatalogPage({ onOpenPricing }: { onOpenPricing: () => void }) {
 function Header({
   onOpenPricing,
   onOpenAuth,
+  theme,
+  onToggleTheme,
 }: {
   onOpenPricing: () => void
   onOpenAuth: () => void
+  theme: 'dark' | 'light'
+  onToggleTheme: () => void
 }) {
   const { user, profile, loading, signOut } = useAuth()
   const location = useLocation()
   const navigate = useNavigate()
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
+  const closeMobileMenu = () => setMobileMenuOpen(false)
 
   return (
     <header className="marketplace-header">
@@ -63,10 +77,24 @@ function Header({
           </span>
         </Link>
 
-        <nav className="marketplace-nav">
+        <button
+          type="button"
+          className="mobile-menu-toggle"
+          aria-expanded={mobileMenuOpen}
+          aria-controls="marketplace-navigation"
+          aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+          onClick={() => setMobileMenuOpen((open) => !open)}
+        >
+          <span />
+          <span />
+          <span />
+        </button>
+
+        <nav id="marketplace-navigation" className={`marketplace-nav ${mobileMenuOpen ? 'marketplace-nav-open' : ''}`}>
           <Link
             to="/"
             className={location.pathname === '/' ? 'marketplace-nav-active' : ''}
+            onClick={closeMobileMenu}
           >
             LUT Catalog
           </Link>
@@ -74,6 +102,7 @@ function Header({
           <Link
             to="/favorites"
             className={location.pathname === '/favorites' ? 'marketplace-nav-active' : ''}
+            onClick={closeMobileMenu}
           >
             Favorites
           </Link>
@@ -84,9 +113,28 @@ function Header({
           >
             Pricing & Membership
           </button>
+
+          {profile?.is_admin && (
+            <Link
+              to="/admin/luts"
+              className={location.pathname.startsWith('/admin') ? 'marketplace-nav-active' : ''}
+              onClick={closeMobileMenu}
+            >
+              Admin
+            </Link>
+          )}
+
         </nav>
 
         <div className="marketplace-account">
+          <button
+            type="button"
+            className="theme-toggle"
+            onClick={onToggleTheme}
+            aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
+          >
+            {theme === 'dark' ? 'Light' : 'Dark'}
+          </button>
           {!loading &&
             (user ? (
               <div className="marketplace-user">
@@ -98,7 +146,7 @@ function Header({
                 </Link>
 
                 <button
-                  onClick={() => navigate('/account')}
+                  onClick={() => { navigate('/account'); closeMobileMenu() }}
                   className="text-xs text-[#8a8580] hover:text-white"
                 >
                   Account
@@ -125,24 +173,40 @@ function Header({
 function App() {
   const [isPricingOpen, setIsPricingOpen] = useState(false)
   const [isAuthOpen, setIsAuthOpen] = useState(false)
+  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
+    const savedTheme = window.localStorage.getItem('bold-unity-theme')
+    return savedTheme === 'light' ? 'light' : 'dark'
+  })
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme
+    window.localStorage.setItem('bold-unity-theme', theme)
+  }, [theme])
 
   return (
     <div className="app">
       <Header
         onOpenPricing={() => setIsPricingOpen(true)}
         onOpenAuth={() => setIsAuthOpen(true)}
+        theme={theme}
+        onToggleTheme={() => setTheme((current) => current === 'dark' ? 'light' : 'dark')}
       />
 
       <main className="marketplace-main">
-        <Routes>
-          <Route
-            path="/"
-            element={<CatalogPage onOpenPricing={() => setIsPricingOpen(true)} />}
-          />
+        <Suspense fallback={<RouteLoading />}>
+          <Routes>
+            <Route
+              path="/"
+              element={<CatalogPage onOpenPricing={() => setIsPricingOpen(true)} />}
+            />
 
           <Route
             path="/lut/:id"
-            element={<LutDetail />}
+            element={
+              <LutDetail
+                onOpenAuth={() => setIsAuthOpen(true)}
+              />
+            }
           />
 
           <Route
@@ -154,7 +218,12 @@ function App() {
             path="/account"
             element={<UserAccount onOpenPricing={() => setIsPricingOpen(true)} />}
           />
-        </Routes>
+
+            <Route path="/admin/luts" element={<AdminLuts />} />
+            <Route path="/admin/plans" element={<AdminPlans />} />
+            <Route path="/admin/reviews" element={<AdminReviews />} />
+          </Routes>
+        </Suspense>
       </main>
 
       <footer className="marketplace-footer">
@@ -170,15 +239,17 @@ function App() {
         </span>
       </footer>
 
-      <PricingModal
-        isOpen={isPricingOpen}
-        onClose={() => setIsPricingOpen(false)}
-      />
+      <Suspense fallback={null}>
+        <PricingModal
+          isOpen={isPricingOpen}
+          onClose={() => setIsPricingOpen(false)}
+        />
 
-      <AuthModal
-        isOpen={isAuthOpen}
-        onClose={() => setIsAuthOpen(false)}
-      />
+        <AuthModal
+          isOpen={isAuthOpen}
+          onClose={() => setIsAuthOpen(false)}
+        />
+      </Suspense>
     </div>
   )
 }

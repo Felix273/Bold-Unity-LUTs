@@ -1,4 +1,4 @@
-import supabase from './supabase'
+import supabase, { isSupabaseConfigured } from './supabase'
 
 export type Lut = {
   id: string
@@ -136,6 +136,8 @@ const SAMPLE_LUTS: Lut[] = [
   }
 ]
 
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+
 async function withTimeout<T>(promise: PromiseLike<T>, ms = 800): Promise<T> {
   let timer: ReturnType<typeof setTimeout>
   const timeoutPromise = new Promise<never>((_, reject) => {
@@ -145,6 +147,12 @@ async function withTimeout<T>(promise: PromiseLike<T>, ms = 800): Promise<T> {
 }
 
 export async function fetchLuts(filters: LutFilters = {}): Promise<Lut[]> {
+  if (!isSupabaseConfigured) return filterSampleLuts(filters)
+
+  if (filters.categoryId && !UUID_PATTERN.test(filters.categoryId)) {
+    return filterSampleLuts(filters)
+  }
+
   try {
     let query = supabase.from('luts').select('*')
 
@@ -202,18 +210,24 @@ export async function fetchLuts(filters: LutFilters = {}): Promise<Lut[]> {
     const res = await withTimeout(query)
     const data = res.data
 
-    if (res.error || !data || data.length === 0) {
-      return filterSampleLuts(filters)
-    }
+    if (res.error) throw res.error
 
-    return data
+    return data ?? []
   } catch {
-    return filterSampleLuts(filters)
+    throw new Error('Unable to load LUTs from Supabase.')
   }
 }
 
 function filterSampleLuts(filters: LutFilters): Lut[] {
   let result = [...SAMPLE_LUTS]
+
+  if (filters.categoryId) {
+    result = result.filter((item) => item.category_id === filters.categoryId)
+  }
+
+  if (filters.featured !== undefined) {
+    result = result.filter((item) => item.featured === filters.featured)
+  }
 
   if (filters.priceType === 'free') {
     result = result.filter((item) => item.price === 0)
@@ -235,6 +249,25 @@ function filterSampleLuts(filters: LutFilters): Lut[] {
         item.description?.toLowerCase().includes(s) ||
         item.author?.toLowerCase().includes(s)
     )
+  }
+
+  switch (filters.sort) {
+    case 'newest':
+      result.sort((a, b) => b.created_at.localeCompare(a.created_at))
+      break
+    case 'rating':
+      result.sort((a, b) => b.rating - a.rating)
+      break
+    case 'price-low':
+      result.sort((a, b) => a.price - b.price)
+      break
+    case 'price-high':
+      result.sort((a, b) => b.price - a.price)
+      break
+    case 'popular':
+    default:
+      result.sort((a, b) => Number(b.featured) - Number(a.featured) || b.downloads - a.downloads)
+      break
   }
 
   return result
@@ -259,21 +292,31 @@ export async function fetchFreeLuts(): Promise<Lut[]> {
 }
 
 export async function fetchLutById(id: string): Promise<Lut | null> {
+  if (!UUID_PATTERN.test(id)) {
+    return SAMPLE_LUTS.find((item) => item.id === id) ?? null
+  }
+
+  if (!isSupabaseConfigured) {
+    return SAMPLE_LUTS.find((item) => item.id === id) ?? null
+  }
+
   try {
     const res = await withTimeout(supabase.from('luts').select('*').eq('id', id).single())
     const data = res.data
 
-    if (res.error || !data) {
-      return SAMPLE_LUTS.find((item) => item.id === id) ?? SAMPLE_LUTS[0]
-    }
+    if (res.error) throw res.error
 
-    return data
+    return data ?? null
   } catch {
-    return SAMPLE_LUTS.find((item) => item.id === id) ?? SAMPLE_LUTS[0]
+    throw new Error('Unable to load this LUT from Supabase.')
   }
 }
 
 export async function downloadFreeLut(lutId: string) {
+  if (!isSupabaseConfigured) {
+    throw new Error('Downloads are unavailable until Supabase is configured.')
+  }
+
   try {
     const res = await withTimeout(
       supabase.rpc('record_free_download', {
@@ -281,12 +324,41 @@ export async function downloadFreeLut(lutId: string) {
       })
     )
 
-    if (res.error) {
-      return true
-    }
+    if (res.error) throw res.error
 
     return res.data
   } catch {
-    return true
+    throw new Error('Unable to record this download. Please try again.')
   }
+}
+
+export async function createLutDownloadUrl(filePath: string): Promise<string> {
+  if (!isSupabaseConfigured) {
+    throw new Error('Downloads are unavailable until Supabase is configured.')
+  }
+
+  if (import.meta.env.VITE_USE_EDGE_DOWNLOADS === 'true') {
+    throw new Error('Use createEntitledLutDownloadUrl with a LUT ID in edge-download mode.')
+  }
+
+  const bucket = import.meta.env.VITE_LUT_ASSET_BUCKET || 'lut-assets'
+  const { data, error } = await supabase.storage
+    .from(bucket)
+    .createSignedUrl(filePath, 60)
+
+  if (error || !data?.signedUrl) {
+    throw new Error(
+      error?.message || 'Unable to prepare the LUT file. Check the asset path and storage policy.',
+    )
+  }
+
+  return data.signedUrl
+}
+
+export async function createEntitledLutDownloadUrl(lutId: string): Promise<string> {
+  const { data, error } = await supabase.functions.invoke('signed-lut-download', {
+    body: { lutId },
+  })
+  if (error || !data?.signedUrl) throw new Error(error?.message || data?.error || 'Unable to prepare the LUT file.')
+  return data.signedUrl
 }
